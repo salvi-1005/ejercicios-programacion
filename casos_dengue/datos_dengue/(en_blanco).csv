@@ -1,0 +1,6 @@
+departamento_id,departamento_nombre,provincia_id,provincia_nombre,anio,semanas_epidemiologicas,evento_nombre,grupo_edad_id,grupo_edad_desc,cantidad_casos
+0,(en blanco),0,(en blanco),2020,6,Dengue,-,Sin Especificar,1.0
+0,(en blanco),0,(en blanco),2020,8,Dengue,9,De 35 a 44 anos,1.0
+0,(en blanco),0,(en blanco),2020,10,Dengue,-,Sin Especificar,1.0
+0,(en blanco),0,(en blanco),2020,19,Dengue,5,De 10 a 14 anos,1.0
+0,(en blanco),0,(en blanco),2020,24,Dengue,9,De 35 a 44 anos,1.0

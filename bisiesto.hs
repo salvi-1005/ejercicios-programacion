@@ -1,0 +1,11 @@
+bisiesto :: Int -> Bool
+bisiesto n | not (esMultiplo n 4) || esMultiplo n 100 && not (esMultiplo n 400) = False
+           | otherwise = True
+
+esMultiplo :: Int -> Int -> Bool
+esMultiplo x y = mod x y == 0  
+               
+
+main :: IO ()
+main = print (5 == 4)
+

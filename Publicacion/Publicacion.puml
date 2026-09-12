@@ -1,0 +1,28 @@
+@startuml
+
+class Publicacion {
+ # titulo : String
+ # precio : double
+
+ + getTitulo()
+ + getPrecio()
+ + mostrarDatos()
+}
+
+class Libro extends Publicacion {
+ - nroDePaginas: int
+ - año : int
+
+ + getNroDePaginas()
+ + getAño()
+ + mostrarDatos()
+}
+
+class Disco extends Publicacion {
+ - minutos: int
+
+ + getMinutos()
+ + mostrarDatos()
+}
+
+@enduml

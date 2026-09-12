@@ -1,0 +1,1 @@
+mount -o \\192.168.1.92\DataVolume\Download z:

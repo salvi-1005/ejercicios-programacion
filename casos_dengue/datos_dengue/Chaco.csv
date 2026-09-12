@@ -1,0 +1,227 @@
+departamento_id,departamento_nombre,provincia_id,provincia_nombre,anio,semanas_epidemiologicas,evento_nombre,grupo_edad_id,grupo_edad_desc,cantidad_casos
+39,2 de Abril,22,Chaco,2018,4,Dengue,9,De 25 a 34 años,1.0
+39,2 de Abril,22,Chaco,2018,12,Dengue,9,De 25 a 34 años,1.0
+39,2 de Abril,22,Chaco,2018,14,Dengue,9,De 25 a 34 años,2.0
+39,2 de Abril,22,Chaco,2018,14,Dengue,10,De 45 a 64 años,1.0
+39,2 de Abril,22,Chaco,2018,15,Dengue,10,De 45 a 64 años,1.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,4,De 2 a 4 años,2.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,5,De 5 a 9 años,4.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,6,De 10 a 14 años,1.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,7,De 15 a 19 años,6.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,8,De 20 a 24 años,6.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,9,De 25 a 34 años,6.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,10,De 35 a 44 años,2.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,10,De 45 a 64 años,9.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,11,Mayor o igual de 65 años,5.0
+39,2 de Abril,22,Chaco,2018,16,Dengue,12,Sin Especificar,1.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,5,De 5 a 9 años,1.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,6,De 10 a 14 años,2.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,7,De 15 a 19 años,5.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,8,De 20 a 24 años,5.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,9,De 25 a 34 años,6.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,10,De 35 a 44 años,1.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,10,De 45 a 64 años,8.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,11,Mayor o igual de 65 años,10.0
+39,2 de Abril,22,Chaco,2018,17,Dengue,12,Sin Especificar,3.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,5,De 5 a 9 años,4.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,6,De 10 a 14 años,1.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,7,De 15 a 19 años,5.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,8,De 20 a 24 años,2.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,9,De 25 a 34 años,9.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,10,De 45 a 64 años,8.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,11,Mayor o igual de 65 años,7.0
+39,2 de Abril,22,Chaco,2018,18,Dengue,12,Sin Especificar,4.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,3,De 13 a 24 meses,1.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,4,De 2 a 4 años,1.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,5,De 5 a 9 años,1.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,6,De 10 a 14 años,4.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,7,De 15 a 19 años,7.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,8,De 20 a 24 años,5.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,9,De 25 a 34 años,9.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,10,De 45 a 64 años,10.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,11,Mayor o igual de 65 años,9.0
+39,2 de Abril,22,Chaco,2018,19,Dengue,12,Sin Especificar,1.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,4,De 2 a 4 años,4.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,5,De 5 a 9 años,1.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,6,De 10 a 14 años,2.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,7,De 15 a 19 años,4.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,8,De 20 a 24 años,4.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,9,De 25 a 34 años,4.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,10,De 45 a 64 años,2.0
+39,2 de Abril,22,Chaco,2018,20,Dengue,11,Mayor o igual de 65 años,3.0
+39,2 de Abril,22,Chaco,2018,21,Dengue,9,De 25 a 34 años,3.0
+39,2 de Abril,22,Chaco,2018,21,Dengue,11,Mayor o igual de 65 años,1.0
+39,2 de Abril,22,Chaco,2018,22,Dengue,7,De 15 a 19 años,1.0
+39,2 de Abril,22,Chaco,2018,22,Dengue,9,De 25 a 34 años,3.0
+105,9 de Julio,22,Chaco,2018,16,Dengue,6,De 10 a 14 años,1.0
+105,9 de Julio,22,Chaco,2018,19,Dengue,11,Mayor o igual de 65 años,2.0
+14,Bermejo,22,Chaco,2018,13,Dengue,5,De 5 a 9 años,1.0
+14,Bermejo,22,Chaco,2018,14,Dengue,10,De 45 a 64 años,2.0
+14,Bermejo,22,Chaco,2018,17,Dengue,9,De 25 a 34 años,1.0
+14,Bermejo,22,Chaco,2018,18,Dengue,5,De 5 a 9 años,1.0
+28,CHACABUCO,22,Chaco,2018,12,Dengue,10,De 35 a 44 años,4.0
+28,CHACABUCO,22,Chaco,2018,12,Dengue,10,De 45 a 64 años,1.0
+28,CHACABUCO,22,Chaco,2018,13,Dengue,6,De 10 a 14 años,1.0
+28,CHACABUCO,22,Chaco,2018,13,Dengue,7,De 15 a 19 años,1.0
+28,CHACABUCO,22,Chaco,2018,13,Dengue,9,De 25 a 34 años,3.0
+28,CHACABUCO,22,Chaco,2018,13,Dengue,10,De 35 a 44 años,1.0
+28,CHACABUCO,22,Chaco,2018,13,Dengue,10,De 45 a 64 años,6.0
+28,CHACABUCO,22,Chaco,2018,14,Dengue,5,De 5 a 9 años,1.0
+28,CHACABUCO,22,Chaco,2018,14,Dengue,6,De 10 a 14 años,1.0
+28,CHACABUCO,22,Chaco,2018,14,Dengue,7,De 15 a 19 años,2.0
+28,CHACABUCO,22,Chaco,2018,14,Dengue,8,De 20 a 24 años,3.0
+28,CHACABUCO,22,Chaco,2018,14,Dengue,9,De 25 a 34 años,1.0
+28,CHACABUCO,22,Chaco,2018,14,Dengue,10,De 35 a 44 años,2.0
+28,CHACABUCO,22,Chaco,2018,14,Dengue,10,De 45 a 64 años,2.0
+28,CHACABUCO,22,Chaco,2018,15,Dengue,8,De 20 a 24 años,1.0
+28,CHACABUCO,22,Chaco,2018,15,Dengue,9,De 25 a 34 años,1.0
+28,CHACABUCO,22,Chaco,2018,15,Dengue,10,De 35 a 44 años,3.0
+28,CHACABUCO,22,Chaco,2018,15,Dengue,10,De 45 a 64 años,2.0
+28,CHACABUCO,22,Chaco,2018,16,Dengue,7,De 15 a 19 años,1.0
+28,CHACABUCO,22,Chaco,2018,16,Dengue,8,De 20 a 24 años,1.0
+28,CHACABUCO,22,Chaco,2018,16,Dengue,9,De 25 a 34 años,3.0
+28,CHACABUCO,22,Chaco,2018,16,Dengue,10,De 35 a 44 años,2.0
+28,CHACABUCO,22,Chaco,2018,16,Dengue,10,De 45 a 64 años,1.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,4,De 2 a 4 años,1.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,5,De 5 a 9 años,1.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,6,De 10 a 14 años,1.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,7,De 15 a 19 años,7.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,8,De 20 a 24 años,4.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,9,De 25 a 34 años,2.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,10,De 35 a 44 años,2.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,10,De 45 a 64 años,4.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,11,Mayor o igual de 65 años,4.0
+28,CHACABUCO,22,Chaco,2018,17,Dengue,12,Sin Especificar,1.0
+28,CHACABUCO,22,Chaco,2018,18,Dengue,6,De 10 a 14 años,3.0
+28,CHACABUCO,22,Chaco,2018,18,Dengue,7,De 15 a 19 años,6.0
+28,CHACABUCO,22,Chaco,2018,18,Dengue,8,De 20 a 24 años,1.0
+28,CHACABUCO,22,Chaco,2018,18,Dengue,9,De 25 a 34 años,5.0
+28,CHACABUCO,22,Chaco,2018,18,Dengue,10,De 45 a 64 años,3.0
+28,CHACABUCO,22,Chaco,2018,18,Dengue,11,Mayor o igual de 65 años,8.0
+28,CHACABUCO,22,Chaco,2018,19,Dengue,5,De 5 a 9 años,2.0
+28,CHACABUCO,22,Chaco,2018,19,Dengue,6,De 10 a 14 años,5.0
+28,CHACABUCO,22,Chaco,2018,19,Dengue,7,De 15 a 19 años,10.0
+28,CHACABUCO,22,Chaco,2018,19,Dengue,8,De 20 a 24 años,5.0
+28,CHACABUCO,22,Chaco,2018,19,Dengue,9,De 25 a 34 años,8.0
+28,CHACABUCO,22,Chaco,2018,19,Dengue,10,De 45 a 64 años,3.0
+28,CHACABUCO,22,Chaco,2018,19,Dengue,11,Mayor o igual de 65 años,5.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,3,De 13 a 24 meses,1.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,5,De 5 a 9 años,3.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,6,De 10 a 14 años,2.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,7,De 15 a 19 años,2.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,8,De 20 a 24 años,3.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,9,De 25 a 34 años,1.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,10,De 45 a 64 años,3.0
+28,CHACABUCO,22,Chaco,2018,20,Dengue,11,Mayor o igual de 65 años,3.0
+28,CHACABUCO,22,Chaco,2018,21,Dengue,6,De 10 a 14 años,1.0
+28,CHACABUCO,22,Chaco,2018,21,Dengue,7,De 15 a 19 años,3.0
+28,CHACABUCO,22,Chaco,2018,21,Dengue,8,De 20 a 24 años,1.0
+28,CHACABUCO,22,Chaco,2018,21,Dengue,9,De 25 a 34 años,1.0
+28,CHACABUCO,22,Chaco,2018,21,Dengue,10,De 45 a 64 años,2.0
+28,CHACABUCO,22,Chaco,2018,21,Dengue,11,Mayor o igual de 65 años,2.0
+28,CHACABUCO,22,Chaco,2018,22,Dengue,6,De 10 a 14 años,1.0
+28,CHACABUCO,22,Chaco,2018,22,Dengue,7,De 15 a 19 años,3.0
+28,CHACABUCO,22,Chaco,2018,22,Dengue,11,Mayor o igual de 65 años,1.0
+28,CHACABUCO,22,Chaco,2018,23,Dengue,7,De 15 a 19 años,2.0
+28,CHACABUCO,22,Chaco,2018,23,Dengue,9,De 25 a 34 años,1.0
+28,CHACABUCO,22,Chaco,2018,23,Dengue,10,De 45 a 64 años,1.0
+21,Comandante Fernández,22,Chaco,2018,13,Dengue,9,De 25 a 34 años,1.0
+21,Comandante Fernández,22,Chaco,2018,15,Dengue,10,De 45 a 64 años,1.0
+21,Comandante Fernández,22,Chaco,2018,18,Dengue,7,De 15 a 19 años,1.0
+21,Comandante Fernández,22,Chaco,2018,27,Dengue,9,De 25 a 34 años,1.0
+43,Fray Justo Santa María de Oro,22,Chaco,2018,16,Dengue,8,De 20 a 24 años,1.0
+43,Fray Justo Santa María de Oro,22,Chaco,2018,16,Dengue,11,Mayor o igual de 65 años,1.0
+49,General Belgrano,22,Chaco,2018,17,Dengue,7,De 15 a 19 años,1.0
+49,General Belgrano,22,Chaco,2018,17,Dengue,10,De 45 a 64 años,1.0
+49,General Belgrano,22,Chaco,2018,17,Dengue,11,Mayor o igual de 65 años,1.0
+49,General Belgrano,22,Chaco,2018,18,Dengue,8,De 20 a 24 años,2.0
+49,General Belgrano,22,Chaco,2018,18,Dengue,9,De 25 a 34 años,2.0
+49,General Belgrano,22,Chaco,2018,18,Dengue,11,Mayor o igual de 65 años,2.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,4,De 2 a 4 años,1.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,5,De 5 a 9 años,3.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,6,De 10 a 14 años,1.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,7,De 15 a 19 años,4.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,8,De 20 a 24 años,6.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,9,De 25 a 34 años,3.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,10,De 45 a 64 años,8.0
+49,General Belgrano,22,Chaco,2018,19,Dengue,11,Mayor o igual de 65 años,6.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,4,De 2 a 4 años,1.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,5,De 5 a 9 años,3.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,6,De 10 a 14 años,9.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,7,De 15 a 19 años,6.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,8,De 20 a 24 años,3.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,9,De 25 a 34 años,7.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,10,De 45 a 64 años,13.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,11,Mayor o igual de 65 años,6.0
+49,General Belgrano,22,Chaco,2018,20,Dengue,12,Sin Especificar,1.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,1,Menor que 1 año,1.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,5,De 5 a 9 años,1.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,7,De 15 a 19 años,4.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,8,De 20 a 24 años,1.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,9,De 25 a 34 años,3.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,10,De 45 a 64 años,2.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,11,Mayor o igual de 65 años,2.0
+49,General Belgrano,22,Chaco,2018,21,Dengue,12,Sin Especificar,1.0
+49,General Belgrano,22,Chaco,2018,22,Dengue,5,De 5 a 9 años,1.0
+49,General Belgrano,22,Chaco,2018,22,Dengue,7,De 15 a 19 años,1.0
+49,General Belgrano,22,Chaco,2018,22,Dengue,9,De 25 a 34 años,1.0
+49,General Belgrano,22,Chaco,2018,22,Dengue,10,De 45 a 64 años,1.0
+49,General Belgrano,22,Chaco,2018,22,Dengue,11,Mayor o igual de 65 años,1.0
+49,General Belgrano,22,Chaco,2018,23,Dengue,6,De 10 a 14 años,2.0
+49,General Belgrano,22,Chaco,2018,23,Dengue,7,De 15 a 19 años,2.0
+49,General Belgrano,22,Chaco,2018,23,Dengue,8,De 20 a 24 años,4.0
+49,General Belgrano,22,Chaco,2018,23,Dengue,9,De 25 a 34 años,1.0
+49,General Belgrano,22,Chaco,2018,23,Dengue,10,De 45 a 64 años,1.0
+49,General Belgrano,22,Chaco,2018,23,Dengue,11,Mayor o igual de 65 años,1.0
+63,General Güemes,22,Chaco,2018,15,Dengue,8,De 20 a 24 años,1.0
+63,General Güemes,22,Chaco,2018,15,Dengue,9,De 25 a 34 años,1.0
+63,General Güemes,22,Chaco,2018,16,Dengue,9,De 25 a 34 años,1.0
+70,Independencia,22,Chaco,2018,15,Dengue,10,De 35 a 44 años,1.0
+70,Independencia,22,Chaco,2018,17,Dengue,8,De 20 a 24 años,1.0
+70,Independencia,22,Chaco,2018,20,Dengue,10,De 45 a 64 años,1.0
+84,Libertador General San Martín,22,Chaco,2018,18,Dengue,7,De 15 a 19 años,1.0
+84,Libertador General San Martín,22,Chaco,2018,19,Dengue,7,De 15 a 19 años,1.0
+84,Libertador General San Martín,22,Chaco,2018,19,Dengue,8,De 20 a 24 años,1.0
+84,Libertador General San Martín,22,Chaco,2018,19,Dengue,9,De 25 a 34 años,1.0
+84,Libertador General San Martín,22,Chaco,2018,20,Dengue,8,De 20 a 24 años,3.0
+84,Libertador General San Martín,22,Chaco,2018,20,Dengue,10,De 45 a 64 años,1.0
+84,Libertador General San Martín,22,Chaco,2018,21,Dengue,7,De 15 a 19 años,1.0
+84,Libertador General San Martín,22,Chaco,2018,21,Dengue,8,De 20 a 24 años,1.0
+98,Mayor Luis J. Fontana,22,Chaco,2018,19,Dengue,5,De 5 a 9 años,1.0
+112,O'Higgins,22,Chaco,2018,17,Dengue,9,De 25 a 34 años,1.0
+112,O'Higgins,22,Chaco,2018,18,Dengue,7,De 15 a 19 años,1.0
+112,O'Higgins,22,Chaco,2018,18,Dengue,8,De 20 a 24 años,1.0
+112,O'Higgins,22,Chaco,2018,18,Dengue,9,De 25 a 34 años,1.0
+112,O'Higgins,22,Chaco,2018,18,Dengue,11,Mayor o igual de 65 años,2.0
+112,O'Higgins,22,Chaco,2018,19,Dengue,7,De 15 a 19 años,1.0
+112,O'Higgins,22,Chaco,2018,19,Dengue,8,De 20 a 24 años,1.0
+112,O'Higgins,22,Chaco,2018,19,Dengue,9,De 25 a 34 años,3.0
+112,O'Higgins,22,Chaco,2018,19,Dengue,10,De 45 a 64 años,3.0
+112,O'Higgins,22,Chaco,2018,19,Dengue,11,Mayor o igual de 65 años,2.0
+112,O'Higgins,22,Chaco,2018,20,Dengue,7,De 15 a 19 años,1.0
+112,O'Higgins,22,Chaco,2018,20,Dengue,9,De 25 a 34 años,1.0
+112,O'Higgins,22,Chaco,2018,21,Dengue,7,De 15 a 19 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,10,Dengue,10,De 45 a 64 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,11,Dengue,9,De 25 a 34 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,12,Dengue,9,De 25 a 34 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,15,Dengue,10,De 35 a 44 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,16,Dengue,8,De 20 a 24 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,16,Dengue,10,De 45 a 64 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,17,Dengue,10,De 45 a 64 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,17,Dengue,11,Mayor o igual de 65 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,18,Dengue,6,De 10 a 14 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,18,Dengue,10,De 45 a 64 años,2.0
+140,SAN FERNANDO,22,Chaco,2018,18,Dengue,12,Sin Especificar,1.0
+140,SAN FERNANDO,22,Chaco,2018,19,Dengue,6,De 10 a 14 años,2.0
+140,SAN FERNANDO,22,Chaco,2018,19,Dengue,7,De 15 a 19 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,19,Dengue,8,De 20 a 24 años,2.0
+140,SAN FERNANDO,22,Chaco,2018,20,Dengue,6,De 10 a 14 años,2.0
+140,SAN FERNANDO,22,Chaco,2018,20,Dengue,8,De 20 a 24 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,20,Dengue,9,De 25 a 34 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,20,Dengue,10,De 45 a 64 años,2.0
+140,SAN FERNANDO,22,Chaco,2018,20,Dengue,11,Mayor o igual de 65 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,21,Dengue,10,De 45 a 64 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,21,Dengue,11,Mayor o igual de 65 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,21,Dengue,12,Sin Especificar,1.0
+140,SAN FERNANDO,22,Chaco,2018,22,Dengue,7,De 15 a 19 años,1.0
+140,SAN FERNANDO,22,Chaco,2018,22,Dengue,10,De 45 a 64 años,1.0

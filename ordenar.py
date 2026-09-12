@@ -1,0 +1,18 @@
+import os
+import datetime
+import time
+
+ordenar = r"C:\Users\SD\Downloads\ordenar"
+
+#10.6)
+hoy = datetime.datetime.now()
+
+for root, dirs, files in os.walk(ordenar):
+    for file in files: 
+        if file.lower().endswith('.png'): 
+            stats_archivo = os.stat(ordenar)
+            print(time.ctime(stats_archivo.st_atime))
+            print (os.path.join(root, file))
+            fecha_modifi = hoy
+
+#os.rename(r"C:\Users\SD\Downloads\ordenar", r"C:\Users\SD\Downloads\imgs_procesadas")

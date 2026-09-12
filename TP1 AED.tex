@@ -1,0 +1,23 @@
+1)
+proc redistribucionDeLosFrutos (in recursos: seq⟨R⟩, in cooperan: seq⟨Bool⟩): seq⟨R⟩{
+requiere: {|recursos| == |cooperan|}
+asegura: {(Para todo i: z)(0 <= i < |recursos| ->l (Para todo j: z)(0 <= j < |cooperan| & i == j) ->l (((Para todo k: z)(0 <= m < |res| -> if cooperan[j] = True, res[k] = (sumatoria desde i = 0 hasta i = |recursos| - 1 (recursos[i]))) else res[k] = 0 fi)))}
+}
+
+2)
+proc trayectoriaDeLosFrutosIndividualesALargoPlazo (inout trayectorias: seq⟨seq⟨R⟩⟩, in cooperan: seq⟨Bool⟩, in
+apuestas: seq⟨seq⟨R⟩⟩, in pagos: seq⟨seq⟨R⟩⟩, in eventos: seq⟨seq⟨N⟩⟩)
+requiere: {(Para todo i: z)(0 <= i < |pagos| ->l pagos[i] >= 0)}
+asegura: {(Para todo i: z)(0 <= i < |cooperan| ->l cooperan[i] = True
+
+3)
+proc trayectoriaExtra~naEscalera (in trayectoria: seq⟨R⟩) : Bool
+requiere: {|trayectoria| >= 0}
+asegura: {(Para todo i: z)(0 <= i < |trayectoria| ->l (Para todo j: z)(0 <= j < |trayectoria| ->l (Para todo k: z)(0 <= k < |trayectoria| & i = j-1 & j = k-1) 
+->l ((Para todo i: z)(0 <= m < |res| -> res[m] = True <-> (trayectoria[i] < trayectoria[j] > trayectoria[k])))))}
+4)
+proc individuoDecideSiCooperarONo (in individuo: N, in recursos: seq⟨R⟩, inout cooperan: seq⟨Bool⟩, in apuestas:
+seq⟨seq⟨R⟩⟩, in pagos: seq⟨seq⟨R⟩⟩, in eventos: seq⟨seq⟨N⟩⟩ ): Bool 
+requiere: {True}
+asegura: {cooperan[individuo] = True <->((Para todo i: z)(0 <= i < |recursos| & i == individuo) ->l recursos[i] > 0) &((Para todo j: z)(0 <= j < |pagos| ->l pagos[[j]]!= 0)) & ((Para todo k:z)(0 <= k < |apuestas| -> apuestas[[k]] != 0))
+& ((Para todo m:z)(0 <= m < |eventos| -> eventos[[m]] != 0))}

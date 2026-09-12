@@ -1,0 +1,31 @@
+@startuml
+
+abstract class Automovil {
+    - patente : String
+    - habilitado : boolean
+    + habilitar()
+}
+
+class AutoMediano {
+    - fechaPermiso : LocalDate
+    + habilitar(fecha : LocalDate)
+}
+
+class Camion {
+    - fechaPermiso : LocalDate
+    - autorizado : boolean
+    + solicitarAutorizacion(c : Concesionaria)
+    + habilitar(fecha : LocalDate)
+}
+
+class Concesionaria {
+    - camionesRegistrados : ArrayList<Camion>
+    + verificarCamion(c : Camion) : boolean
+}
+
+Automovil <|-- AutoMediano
+Automovil <|-- Camion
+
+Camion --> Concesionaria
+
+@enduml
