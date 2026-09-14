@@ -993,6 +993,22 @@ print("Partes puras de [1, 2, 3]:")
 print(partes_pura([1, 2, 3]))
 # Salida: [[], [3], [2], [2, 3], [1], [1, 3], [1, 2], [1, 2, 3]]
 
+from functools import reduce
+
+def partes_funcional_reduce(lista):
+    # El acumulador 'acum' empieza valiendo [[]] (el valor inicial)
+    # Por cada 'elemento' de la lista, generamos las nuevas sublistas y las unimos
+    return reduce(
+        lambda acum, elemento: acum + [sublista + [elemento] for sublista in acum], 
+        lista, 
+        [[]]
+    )
+
+# Prueba de ejecución
+print("Partes con Reduce:")
+print(partes_funcional_reduce([1, 2, 3]))
+# Salida: [[], [1], [2], [1, 2], [3], [1, 3], [2, 3], [1, 2, 3]]
+
 
 #46)
 
@@ -1045,8 +1061,46 @@ def permutaciones_pura(lista):
 
 # Prueba de ejecución
 print("\nPermutaciones puras de [1, 2, 3]:")
-print(permutaciones_pura([2, 2, 3]))
+print(permutaciones_pura([1, 2, 3]))
 # Salida: [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+
+# Auxiliar 2: Simula el ciclo 'for' controlando los índices y los elementos ya usados
+def iterar_elementos_sin_repetir_rec(lista, i=0, usados=None):
+    if usados is None:
+        usados = []  # Inicializamos nuestra lista de control de elementos procesados
+        
+    # Caso base del ciclo: si el índice llega al final de la lista
+    if i >= len(lista):
+        return []
+    
+    fijo = lista[i]
+    
+    # CONTROL DE DUPLICADOS: Si el elemento ya fue usado como 'fijo' en este nivel,
+    # lo salteamos recursivamente avanzando al siguiente índice (i + 1)
+    if fijo in usados:
+        return iterar_elementos_sin_repetir_rec(lista, i + 1, usados)
+    
+    # Si no fue usado, lo agregamos a la lista de usados de este nivel de forma pura
+    nuevos_usados = usados + [fijo]
+    
+    # Procesamos el resto de la lista de forma normal
+    resto = lista[:i] + lista[i+1:]
+    perms_del_resto = permutaciones_sin_repetidos_pura(resto)
+    combinadas = pegar_adelante_rec(fijo, perms_del_resto)
+    
+    # Pasamos al siguiente elemento (i + 1) arrastrando la lista de 'nuevos_usados'
+    return combinadas + iterar_elementos_sin_repetir_rec(lista, i + 1, nuevos_usados)
+
+# Función Principal de Permutaciones sin Repetidos
+def permutaciones_sin_repetidos_pura(lista):
+    if len(lista) <= 1:
+        return [lista]
+    return iterar_elementos_sin_repetir_rec(lista)
+
+# Prueba de fuego con elementos repetidos
+print("Permutaciones sin repetidos de [2, 2, 3]:")
+print(permutaciones_sin_repetidos_pura([2, 2, 3]))
+# Salida correcta sin duplicados: [[2, 2, 3], [2, 3, 2], [3, 2, 2]]
 
 
 def permutaciones_iterativas(lista):
