@@ -1045,7 +1045,7 @@ def permutaciones_pura(lista):
 
 # Prueba de ejecución
 print("\nPermutaciones puras de [1, 2, 3]:")
-print(permutaciones_pura([1, 2, 3]))
+print(permutaciones_pura([2, 2, 3]))
 # Salida: [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
 
 
