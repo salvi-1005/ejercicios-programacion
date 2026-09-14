@@ -816,3 +816,177 @@ validas = [(0,0),(0,1),(0,2),(1,0),(1,1),(1,2),(2,0),(2,1),(2,2)]
 salida = (0,0)
 llegada = (2,2)
 print(f"Todos los caminos válidos: {laberinto([salida], validas, llegada)}")
+
+#1)
+
+def sumatoria_fila(lista):
+    if not lista:
+        return 0
+    return lista[0] + sumatoria_fila(lista[1:])
+    
+def obtener_columna_rec(matriz, j, i=0):
+    if i >= len(matriz):
+        return []
+    return [matriz[i][j]] + obtener_columna_rec(matriz, j, i + 1)
+
+def matriz_transpuesta(matriz, j=0):
+    if j >= len(matriz[0]):
+        return []
+    return [obtener_columna_rec(matriz, j)] + matriz_transpuesta(matriz, j + 1)
+
+def restar_esquinas(matriz):
+    return - matriz[0][0] - matriz[-1][0] - matriz[0][-1] - matriz[-1][-1]
+
+def suma_bordes(matriz, i=-1):
+    if i == 1:
+        return restar_esquinas(matriz)
+    return sumatoria_fila(matriz[i]) + sumatoria_fila(matriz_transpuesta(matriz)[i]) + \
+        + suma_bordes(matriz, i+1)
+        
+matriz = [[1,2,3], [6,5,9], [8,7,4]]
+print(f"Suma de bordes de {matriz}: {suma_bordes(matriz)}")
+
+#2)
+
+class Nodo:
+    def __init__(self, dato):
+        self.dato = dato
+        self.siguiente = None
+
+class TADListaEnlazada:
+    def __init__(self):
+        self.cabeza = None
+        self._tamaño = 0
+    def es_vacia(self):
+        return self.cabeza is None
+    def agregar(self, dato):
+        nuevo_nodo = Nodo(dato)
+        if self.es_vacia():
+            self.cabeza = nuevo_nodo
+        else:
+            actual = self.cabeza
+            while actual.siguiente is not None:
+                actual = actual.siguiente
+            actual.siguiente = nuevo_nodo
+        self._tamaño += 1
+    def tamaño(self):
+        return self._tamaño
+    def eliminar(self, dato):
+        actual = self.cabeza
+        anterior = None
+        encontrado = False
+
+        while actual is not None and not encontrado:
+            if actual.dato == dato:
+                encontrado = True
+            else:
+                anterior = actual
+                actual = actual.siguiente
+
+        if encontrado:
+            if anterior is None:
+                self.cabeza = actual.siguiente
+            else:
+                anterior.siguiente = actual.siguiente
+            self._tamaño -= 1
+            return True
+        return False
+    def obtener(self, indice):
+        if indice < 0 or indice >= self._tamaño:
+            raise IndexError("Índice fuera de rango")
+        actual = self.cabeza
+        for _ in range(indice):
+            actual = actual.siguiente
+        return actual.dato
+    def __str__(self):
+        """Muestra los elementos de la lista en formato visual."""
+        elementos = []
+        actual = self.cabeza
+        while actual is not None:
+            elementos.append(str(actual.dato))
+            actual = actual.siguiente
+        return " -> ".join(elementos)
+    def filtrar_nodos(self, condicion):
+        while self.cabeza is not None and not condicion(self.cabeza.dato):
+            self.cabeza = self.cabeza.siguiente
+            self._tamaño -= 1
+
+        actual = self.cabeza
+        while actual is not None and actual.siguiente is not None:
+            if not condicion(actual.siguiente.dato):
+                actual.siguiente = actual.siguiente.siguiente
+                self._tamaño -= 1
+            else:
+                actual = actual.siguiente
+
+mi_lista = TADListaEnlazada()
+
+mi_lista.agregar(10)
+mi_lista.agregar(15)
+mi_lista.agregar(20)
+mi_lista.agregar(25)
+mi_lista.agregar(30)
+
+condicion = lambda x: x % 10 == 0
+mi_lista.filtrar_nodos(condicion)
+print("Lista con múltiplos de 10:",mi_lista)
+
+#3)
+
+procesar_cadena = lambda letra: lambda accion: lambda lista_cadenas: \
+    list(map(accion, filter(lambda x: x[0] == letra, lista_cadenas)))
+
+letra = 'a'
+pasar_mayuscula = lambda x: x.upper()
+lista_cadenas = ['arbol', 'espejo', 'ala', 'casa', 'alambre']
+
+resultado = procesar_cadena(letra)(pasar_mayuscula)(lista_cadenas)
+print("Lista filtrada en mayúsculas:")
+print(resultado)
+
+def agregar_elemento_rec(elemento, lista_de_listas):
+    if not lista_de_listas:
+        return []
+    primera_con_elemento = [elemento] + lista_de_listas[0]
+    return [primera_con_elemento] + agregar_elemento_rec(elemento, lista_de_listas[1:])
+
+def partes(lista):
+    if not lista:
+        return [[]]
+    primero = lista[0]
+    resto_partes = partes(lista[1:])
+    con_primero = agregar_elemento_rec(primero, resto_partes)
+    return resto_partes + con_primero
+
+def combinaciones_longitud_n(lista, n, i = 0):
+    if i == len(partes(lista)):
+        return []
+    if len(partes(lista)[i]) == n:
+        return [partes(lista)[i]] + combinaciones_longitud_n(lista, n, i+1)
+    return combinaciones_longitud_n(lista, n, i+1)
+
+lista = [1,2,3,4]
+n = 2
+print(combinaciones_longitud_n(lista, n))
+
+from functools import reduce
+
+def total_por_categoria(acum, producto):
+    cat = producto["categoria"] 
+    subtotal = producto["precio"] * producto["cantidad"]
+    if cat in acum:
+        acum[cat] += subtotal
+    else:
+        acum[cat] = subtotal
+    return acum
+
+carrito = [
+    {"producto": "Teclado", "categoria": "tecnologia", "precio": 100, "cantidad": 2},
+    {"producto": "Monitor", "categoria": "tecnologia", "precio": 300, "cantidad": 1},
+    {"producto": "Manzana", "categoria": "alimentos", "precio": 5, "cantidad": 6},
+    {"producto": "Remera", "categoria": "ropa", "precio": 40, "cantidad": 2},
+    {"producto": "Banana", "categoria": "alimentos", "precio": 4, "cantidad": 5}
+]
+
+frecuencias = reduce(total_por_categoria, carrito, {})  
+print(f"Tabla de total por categoría: {frecuencias}")

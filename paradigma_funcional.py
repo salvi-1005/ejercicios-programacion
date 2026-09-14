@@ -404,6 +404,42 @@ def combinaciones_longitud_3(lista):
                 resultado.append([primero, resto[j], resto[k]])
     return resultado
 
+# Auxiliar 1: Combina un elemento fijo con pares de elementos
+def combinar_uno_con_pares(elem, lista_pares):
+    if not lista_pares:
+        return []
+    return [[elem] + lista_pares[0]] + combinar_uno_con_pares(elem, lista_pares[1:])
+
+# Auxiliar 2: Genera pares (longitud 2) de forma puramente recursiva
+def combinaciones_long_2_pura(lista):
+    if len(lista) < 2:
+        return []
+    
+    def conectar_elemento(x, elms):
+        if not elms:
+            return []
+        return [[x, elms[0]]] + conectar_elemento(x, elms[1:])
+        
+    return conectar_elemento(lista[0], lista[1:]) + combinaciones_long_2_pura(lista[1:])
+
+# Función Principal: Combinaciones de longitud 3 puramente recursiva
+def combinaciones_longitud_3_pura(lista):
+    if len(lista) < 3:
+        return []
+    
+    # Pasos:
+    # 1. Tomamos el primero y lo combinamos con los pares del resto
+    con_primero = combinar_uno_con_pares(lista[0], combinaciones_long_2_pura(lista[1:]))
+    # 2. Llamada recursiva para el resto de la lista
+    sin_primero = combinaciones_longitud_3_pura(lista[1:])
+    
+    return con_primero + sin_primero
+
+# Prueba
+print(combinaciones_longitud_3_pura([1, 2, 3, 4]))
+# Salida: [[1, 2, 3], [1, 2, 4], [1, 3, 4], [2, 3, 4]]
+
+
 def generador_combinaciones_longitud_2():
     lista = [1,2,3,4,5]
     yield from combinaciones_longitud_2(lista)

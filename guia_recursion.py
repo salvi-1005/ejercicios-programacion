@@ -963,6 +963,37 @@ def partes(lista):
 lista = [1,2,3]
 print(f"El conjunto de partes de {lista} es {partes(lista)}")
 
+# Auxiliar recursiva: toma un elemento y lo inserta al principio de cada sublista
+def agregar_elemento_rec(elemento, lista_de_listas):
+    # Caso base: si ya procesamos todas las sublistas, devolvemos una lista vacía
+    if not lista_de_listas:
+        return []
+    
+    # Toma la primera sublista, le concatena el elemento, y procesa recursivamente el resto
+    primera_con_elemento = [elemento] + lista_de_listas[0]
+    return [primera_con_elemento] + agregar_elemento_rec(elemento, lista_de_listas[1:])
+
+# Función Principal de Partes
+def partes_pura(lista):
+    # Caso base: las partes de una lista vacía es una lista que contiene a la lista vacía [[]]
+    if not lista:
+        return [[]]
+    
+    primero = lista[0]
+    resto_partes = partes_pura(lista[1:])
+    
+    # En lugar de usar un for, llamamos a la auxiliar recursiva
+    con_primero = agregar_elemento_rec(primero, resto_partes)
+    
+    # Concatenamos de forma pura ambos bloques de resultados
+    return resto_partes + con_primero
+
+# Prueba de ejecución
+print("Partes puras de [1, 2, 3]:")
+print(partes_pura([1, 2, 3]))
+# Salida: [[], [3], [2], [2, 3], [1], [1, 3], [1, 2], [1, 2, 3]]
+
+
 #46)
 
 def permutaciones(lista):
@@ -978,6 +1009,45 @@ def permutaciones(lista):
 
 lista = [6,2,3]
 print(f"Las permutaciones de {lista} son {permutaciones(lista)}")
+
+# Auxiliar 1: Pega un elemento al inicio de cada una de las permutaciones generadas
+def pegar_adelante_rec(elemento, permutaciones_del_resto):
+    if not permutaciones_del_resto:
+        return []
+    return [[elemento] + permutaciones_del_resto[0]] + pegar_adelante_rec(elemento, permutaciones_del_resto[1:])
+
+# Auxiliar 2: Simula el ciclo 'for' que recorre las posiciones (i) de la lista
+def iterar_elementos_rec(lista, i=0):
+    # Caso base del bucle ficticio: si el índice llega al final de la lista
+    if i >= len(lista):
+        return []
+    
+    # Extraemos el elemento en la posición 'i' sin usar ciclos
+    fijo = lista[i]
+    resto = lista[:i] + lista[i+1:]
+    
+    # 1. Permutamos recursivamente el resto
+    perms_del_resto = permutaciones_pura(resto)
+    # 2. Le pegamos el elemento fijo adelante a todas esas permutaciones obtenidas
+    combinadas = pegar_adelante_rec(fijo, perms_del_resto)
+    
+    # 3. Avanzamos a la siguiente posición (i + 1) simulando el paso del bucle
+    return combinadas + iterar_elementos_rec(lista, i + 1)
+
+# Función Principal de Permutaciones
+def permutaciones_pura(lista):
+    # Caso base: si tiene 0 o 1 elemento, su única permutación es ella misma
+    if len(lista) <= 1:
+        return [lista]
+    
+    # Delegamos todo el recorrido e inserciones a la función recursiva de control de índices
+    return iterar_elementos_rec(lista)
+
+# Prueba de ejecución
+print("\nPermutaciones puras de [1, 2, 3]:")
+print(permutaciones_pura([1, 2, 3]))
+# Salida: [[1, 2, 3], [1, 3, 2], [2, 1, 3], [2, 3, 1], [3, 1, 2], [3, 2, 1]]
+
 
 def permutaciones_iterativas(lista):
     actual = sorted(lista)
@@ -1517,6 +1587,27 @@ matriz = [[6,3,7],
           [9,2,8]]
 print(matriz_transpuesta(matriz))
 
+# Auxiliar: Extrae una columna específica 'j' de la matriz
+def obtener_columna_rec(matriz, j, i=0):
+    if i >= len(matriz):
+        return []
+    return [matriz[i][j]] + obtener_columna_rec(matriz, j, i + 1)
+
+# Función Principal: Transpone la matriz recorriendo las columnas 'j'
+def matriz_transpuesta_pura(matriz, j=0):
+    # Caso base: si ya procesamos todas las columnas
+    if j >= len(matriz[0]):
+        return []
+    
+    # Paso recursivo: armamos la columna j y pasamos a la j+1
+    return [obtener_columna_rec(matriz, j)] + matriz_transpuesta_pura(matriz, j + 1)
+
+# Prueba
+matriz = [[6, 3, 7], [5, 4, 1], [9, 2, 8] ]
+print(matriz_transpuesta_pura(matriz))
+# Salida: [[6, 5, 9], [3, 4, 2], [7, 1, 8]]
+
+
 def esSimetrica(matriz, i=0):
     matriz_transp = matriz_transpuesta(matriz)
     if matriz[0][i:] != matriz_transp[i]:
@@ -1566,6 +1657,31 @@ matriz = [[6,5,9,4,1],
 
 print(f"La matriz triangular inferior de {matriz} es {triangularInferior(matriz)}")
      
+# Auxiliar: Construye una fila cortando los elementos hasta que j < i
+def filtrar_fila_rec(fila_matriz, i, j=0):
+    if j >= len(fila_matriz) or j >= i:
+        return []
+    return [fila_matriz[j]] + filtrar_fila_rec(fila_matriz, i, j + 1)
+
+# Función Principal: Recorre las filas de la matriz
+def triangular_inferior_pura(matriz, i=1):
+    if i >= len(matriz):
+        return []
+    
+    # Procesamos la fila actual de forma recursiva
+    fila_filtrada = filtrar_fila_rec(matriz[i], i)
+    
+    # Avanzamos a la siguiente fila
+    return [fila_filtrada] + triangular_inferior_pura(matriz, i + 1)
+
+# Prueba
+matriz = [[6, 5, 9],
+          [5, 4, 1],
+          [9, 1, 8]]
+print(triangular_inferior_pura(matriz))
+# Salida: [[5], [9, 1]]
+
+
 #64)
     
 def ElementosDiagonal(matriz, i=0):
