@@ -71,6 +71,16 @@ divisor = 2
 resultado = cociente(dividendo, divisor)
 print(f"{dividendo} / {divisor} es {resultado}")
 
+def cociente_iterativo(dividendo: int, divisor: int) -> int:
+    resultado = 0
+    while dividendo >= divisor:
+        dividendo = dividendo // divisor
+        resultado += 1
+    return resultado
+
+resultado = cociente_iterativo(dividendo, divisor)
+print(f"{dividendo} / {divisor} es {resultado}")
+
 def resto(dividendo: int, divisor: int) -> int:
     if dividendo < divisor:
         return dividendo
@@ -166,15 +176,19 @@ factores_a(20) # Imprime: 2, 2, 5
     
 #b)
 
+def dividirTodoLoQuePueda(num, div):
+    if num % div != 0:
+        return num
+    return dividirTodoLoQuePueda(num//div, div)
+
 def buscar_factores_unicos(numero: int, div: int) -> None:
         if numero <= 1:
             return
         if numero % div == 0:
             print(div)
             # Para no repetir, dividimos TODO lo que se pueda por este divisor
-            while numero % div == 0:
-                numero //= div
-            buscar_factores_unicos(numero, div + 1)
+            num = dividirTodoLoQuePueda(numero, div)
+            buscar_factores_unicos(num, div + 1)
         else:
             buscar_factores_unicos(numero, div + 1)
             
@@ -201,6 +215,49 @@ n = 4
 k = 2
 print(f"combinatorio en base a {n} y {k}:")
 print(combinatorio(n,k))
+
+def factorial_iterativo(numero):
+    resultado = 1
+    # Multiplica secuencialmente desde 1 hasta el número inclusive
+    for i in range(1, numero + 1):
+        resultado *= i
+    return resultado
+
+def combinatorio_iterativo(n, k):
+    # Validaciones básicas de límites
+    if k > n or k < 0:
+        return 0
+    if k == 0 or k == n:
+        return 1
+        
+    # Aplicamos la fórmula matemática usando los factoriales iterativos
+    return factorial_iterativo(n) // (factorial_iterativo(k) * factorial_iterativo(n - k))
+
+# Prueba idéntica a la de tu pantalla (Líneas 204-207)
+n = 4
+k = 2
+print(f"combinatorio en base a {n} y {k} (Iterativo):")
+print(combinatorio_iterativo(n, k))  # Imprime: 6
+
+from functools import reduce
+
+# 1. Definimos el factorial de forma funcional usando reduce
+# Multiplica secuencialmente todos los números en el rango de 1 a x
+factorial_funcional = lambda x: reduce(lambda acum, elem: acum * elem, range(1, x + 1), 1)
+
+# 2. Definimos el combinatorio aplicando la fórmula matemática directa
+combinatorio_funcional = lambda n, k: (
+    0 if (k > n or k < 0) else
+    1 if (k == 0 or k == n) else
+    factorial_funcional(n) // (factorial_funcional(k) * factorial_funcional(n - k))
+)
+
+# Prueba idéntica a tu código de Spyder
+n = 4
+k = 2
+print(f"combinatorio en base a {n} y {k} (Funcional):")
+print(combinatorio_funcional(n, k))  # Imprime: 6
+
 
 #11)
 #a)
@@ -929,6 +986,27 @@ print(f"La longitud total de la lista {lista} es: {longitudLL(lista)}")
 
 #44)
 
+def agregar_menores_a_la_lista(lista, pivote):
+    if not lista:
+        return []
+    if lista[0] < pivote:
+        return [lista[0]] + agregar_menores_a_la_lista(lista[1:], pivote)
+    return agregar_menores_a_la_lista(lista[1:], pivote)
+
+def agregar_iguales_a_la_lista(lista, pivote):
+    if not lista:
+        return []
+    if lista[0] == pivote:
+        return [lista[0]] + agregar_iguales_a_la_lista(lista[1:], pivote)
+    return agregar_iguales_a_la_lista(lista[1:], pivote)
+
+def agregar_mayores_a_la_lista(lista, pivote):
+    if not lista:
+        return []
+    if lista[0] > pivote:
+        return [lista[0]] + agregar_mayores_a_la_lista(lista[1:], pivote)
+    return agregar_mayores_a_la_lista(lista[1:], pivote)
+
 def quicksort(lista):
   # Caso base: si la lista tiene 0 o 1 elemento, ya está ordenada
   if len(lista) <= 1:
@@ -938,9 +1016,9 @@ def quicksort(lista):
   pivote = lista[len(lista) // 2]
 
   # Dividimos los elementos en tres grupos
-  menores = [x for x in lista if x < pivote]
-  iguales = [x for x in lista if x == pivote]
-  mayores = [x for x in lista if x > pivote]
+  menores = agregar_menores_a_la_lista(lista, pivote)
+  iguales = agregar_iguales_a_la_lista(lista, pivote)
+  mayores = agregar_mayores_a_la_lista(lista, pivote)
 
   # Llamada recursiva y combinación de resultados
   return quicksort(menores) + iguales + quicksort(mayores)
@@ -948,7 +1026,7 @@ def quicksort(lista):
 # Ejemplo de uso
 mi_lista = [36, 7, 23, 1, 45, 12]
 lista_ordenada = quicksort(mi_lista)
-print(lista_ordenada)  # Resultado: [1, 7, 12, 23, 36, 45]
+print(f"Lista ordenada con quicksort: {lista_ordenada}")  # Resultado: [1, 7, 12, 23, 36, 45]
 
 #45)
 
@@ -1184,6 +1262,42 @@ def todosConTodosN(listas):
 
 lista = [[6,2,3],[7,5],[9,4]]
 print(f"Combinaciones de {lista}: {todosConTodosN(lista)}")
+
+# Auxiliar 1: Toma un solo elemento y lo pega adelante de cada sublista del resto
+def combinar_elemento_con_listas(x, combinaciones):
+    if not combinaciones:
+        return []
+    # Pegamos el elemento al inicio de la primera sublista y procesamos el resto
+    return [[x] + combinaciones[0]] + combinar_elemento_con_listas(x, combinaciones[1:])
+
+# Auxiliar 2: Recorre la primera lista de forma recursiva y junta las combinaciones
+def combinar_lista_con_todo(primera_lista, combinaciones_resto):
+    if not primera_lista:
+        return []
+    
+    # 1. Combinamos el número actual con todas las combinaciones que venían del resto
+    combinaciones_del_numero = combinar_elemento_con_listas(primera_lista[0], combinaciones_resto)
+    
+    # 2. Avanzamos recursivamente con el siguiente número de la primera lista
+    return combinaciones_del_numero + combinar_lista_con_todo(primera_lista[1:], combinaciones_resto)
+
+# Función Principal
+def todosConTodosN_pura(listas):
+    # Caso base: si no quedan más listas por procesar, devolvemos [[]]
+    if not listas:
+        return [[]]
+    
+    primera_lista = listas[0]
+    # Resolvemos el subproblema para el resto de las listas mediante recursión
+    combinaciones_resto = todosConTodosN_pura(listas[1:])
+    
+    # En lugar del doble for, disparamos la cadena de funciones auxiliares
+    return combinar_lista_con_todo(primera_lista, combinaciones_resto)
+
+# Prueba del enunciado
+lista = [[6,2,3], [7,5], [9,4]]
+print(f"Combinaciones puras:\n{todosConTodosN_pura(lista)}")
+
 
 #49)
 

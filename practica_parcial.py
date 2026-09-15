@@ -988,5 +988,7 @@ carrito = [
     {"producto": "Banana", "categoria": "alimentos", "precio": 4, "cantidad": 5}
 ]
 
+print(total_por_categoria({}, carrito[0]))
+
 frecuencias = reduce(total_por_categoria, carrito, {})  
 print(f"Tabla de total por categoría: {frecuencias}")
