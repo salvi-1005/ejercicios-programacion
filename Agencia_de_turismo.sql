@@ -463,35 +463,6 @@ $$;
 
 CALL mostrar_guia(27803589);
 
-CREATE OR REPLACE PROCEDURE mostrar_tours_client(gen_id INT)
-LANGUAGE plpgsql
-AS $$
-DECLARE
-    pelicula_actual RECORD;
-BEGIN
-
-    FOR pelicula_actual IN
-        SELECT
-            Peliculas.Titulo,
-            Genero.Nombre AS Genero
-        FROM Peliculas
-        INNER JOIN Genero
-            ON Genero.ID = Peliculas.IdGenero
-        WHERE Peliculas.IdGenero = gen_id
-    LOOP
-
-        RAISE NOTICE
-        'Película: %, Género: %',
-        pelicula_actual.Titulo,
-        pelicula_actual.Genero;
-
-    END LOOP;
-
-END;
-$$;
-
-CALL mostrar_peliculas(1);
-
 --Function
 
 CREATE OR REPLACE FUNCTION calcular_sueldo(
@@ -667,4 +638,33 @@ EXECUTE FUNCTION actualizar_fecha_salida();
 UPDATE Tour SET Fecha_hora_llegada = '2026-10-01 17:30:00' WHERE Codigo = 1;
 
 SELECT * FROM Tour;
+
+--extras
+
+CREATE OR REPLACE PROCEDURE mostrar_reservas_cliente(numero_cliente INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    reserva_actual RECORD;
+BEGIN
+
+    FOR reserva_actual IN
+        SELECT
+            C.Nombre AS Cliente,
+            R.Codigo 
+        FROM ReservaS R 
+		INNER JOIN Cliente C ON C.ID = R.IdCliente
+        WHERE C.ID = numero_cliente
+    LOOP
+
+        RAISE NOTICE
+        'Reserva: %, Nombre: %',
+        reserva_actual.Codigo,
+        reserva_actual.Cliente;
+
+    END LOOP;
+
+END;
+$$;
+CALL mostrar_reservas_cliente(44816375);
 

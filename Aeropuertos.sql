@@ -663,3 +663,34 @@ INSERT INTO Aerolinea VALUES
 SELECT * FROM Aerolinea;
 
 --SELECT AGE(NOW(), '2003-05-10');
+
+--extras
+
+CREATE OR REPLACE PROCEDURE mostrar_pasajeros_vuelo(numero_vuelo INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    pasajero_actual RECORD;
+BEGIN
+
+    FOR pasajero_actual IN
+        SELECT
+            P.Nombre,
+			P.NumeroDocumento,
+            V.Numero_de_vuelo AS Vuelo
+        FROM Pasajero P
+		INNER JOIN Reserva R ON R.DocumentoPasajero = P.NumeroDocumento
+		INNER JOIN Vuelo V ON V.Numero_de_vuelo = R.NumeroVuelo
+        WHERE V.Numero_de_vuelo = numero_vuelo
+    LOOP
+
+        RAISE NOTICE
+        'Nombre: %, Vuelo: %',
+        pasajero_actual.Nombre,
+        pasajero_actual.Vuelo;
+
+    END LOOP;
+
+END;
+$$;
+CALL mostrar_pasajeros_vuelo(2464);

@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS Director CASCADE;
 DROP TABLE IF EXISTS Tipo CASCADE;
 DROP TABLE IF EXISTS Socios CASCADE;
 DROP TABLE IF EXISTS Transaccion CASCADE;
+DROP TABLE IF EXISTS Pelicula_genero CASCADE;
 
 CREATE TABLE IF NOT EXISTS Socios (
     ID INT PRIMARY KEY,
@@ -19,7 +20,8 @@ CREATE TABLE IF NOT EXISTS Socios (
 INSERT INTO Socios VALUES
 (44816375, 'Salvador', 'Dangelo'),
 (05607618, 'Roberto', 'Fernandez'),
-(54897324, 'Nicolás', 'Sanchez');
+(54897324, 'Nicolás', 'Sanchez'),
+(10918724, 'Graciela', 'Ferrari');
 
 CREATE TABLE IF NOT EXISTS Genero (
     ID INT PRIMARY KEY,
@@ -30,7 +32,8 @@ INSERT INTO Genero VALUES
 (1, 'Policial'),
 (2, 'Navidad'),
 (3, 'Infantil'),
-(4, 'Terror');
+(4, 'Terror'),
+(5, 'Comedia');
 
 CREATE TABLE IF NOT EXISTS Director (
     ID INT PRIMARY KEY,
@@ -311,3 +314,142 @@ EXECUTE FUNCTION validar_borrado_pelicula();
 --DELETE FROM Peliculas WHERE ID = 638;
 
 SELECT * FROM Peliculas AS p INNER JOIN Director AS d ON d.ID = p.IdDirector;
+
+--extras:
+
+--1)
+
+SELECT D.Nombre, COUNT(*) AS CantidadPeliculas FROM Peliculas P INNER JOIN Director D ON D.ID = P.IdDirector
+GROUP BY D.ID, D.Nombre HAVING COUNT(*) > 1;
+
+--2)
+
+SELECT G.Nombre FROM Genero G LEFT JOIN Pelicula_genero PG ON PG.IdGenero = G.ID
+LEFT JOIN Peliculas P ON P.ID = PG.IdPelicula WHERE P.Titulo IS NULL;
+
+--3)
+
+SELECT S.Nombre, S.Apellido FROM Socios S LEFT JOIN Transaccion T ON T.IdSocio = S.ID
+WHERE T.ID IS NULL;
+
+--4)
+
+SELECT MIN(anio) FROM Peliculas;
+
+--5)
+
+SELECT G.Nombre AS Género, COUNT(*) AS CantidadPeliculas FROM Peliculas P 
+INNER JOIN Pelicula_genero PG ON PG.IdPelicula = P.ID
+INNER JOIN Genero G ON G.ID = PG.IdGenero
+GROUP BY G.ID, G.Nombre ORDER BY CantidadPeliculas DESC;
+
+--6)
+
+CREATE OR REPLACE FUNCTION promedio_anio_peliculas()
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    promedio DECIMAL;
+BEGIN
+
+    SELECT
+        AVG(anio)
+    INTO promedio
+    FROM Peliculas;
+
+    RETURN promedio;
+
+END;
+$$;
+
+SELECT(promedio_anio_peliculas());
+
+CREATE OR REPLACE FUNCTION cantidad_peliculas_genero(id_genero INT)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    cantidad INT;
+BEGIN
+
+    SELECT
+        COUNT(*)
+    INTO cantidad
+    FROM Peliculas P INNER JOIN Pelicula_genero PG ON PG.IdPelicula = P.ID
+	INNER JOIN Genero G ON G.ID = PG.IdGenero
+    WHERE G.ID = id_genero;
+    RETURN cantidad;
+
+END;
+$$;
+
+SELECT(cantidad_peliculas_genero(1));
+
+CREATE OR REPLACE FUNCTION cantidad_transacciones_socio(id_socio INT)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    cantidad INT;
+BEGIN
+
+    SELECT 
+        COUNT(*)
+    INTO cantidad
+    FROM Socios S INNER JOIN Transaccion T ON T.IdSocio = S.ID
+    WHERE S.ID = id_socio;
+    RETURN cantidad;
+
+END;
+$$;
+
+SELECT(cantidad_transacciones_socio(44816375));
+
+CREATE OR REPLACE PROCEDURE mostrar_director(id_director INT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE NOTICE '%',
+    (
+        SELECT CONCAT(
+            'ID: ',
+            ID,
+            ' Nombre: ',
+            Nombre
+        )
+        FROM Director
+        WHERE ID = id_director
+    );
+END;
+$$;
+
+CALL mostrar_director(32617924);
+
+CREATE OR REPLACE PROCEDURE mostrar_peliculas_director(id_director INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    pelicula_actual RECORD;
+BEGIN
+
+    FOR pelicula_actual IN
+        SELECT
+            P.Titulo,
+            D.Nombre AS Director
+        FROM Peliculas P
+		INNER JOIN Director D
+		    ON D.ID = P.IdDirector
+        WHERE D.ID = id_director
+    LOOP
+
+        RAISE NOTICE
+        'Pelicula: %, Genero: %',
+        pelicula_actual.Titulo,
+        pelicula_actual.Director;
+
+    END LOOP;
+
+END;
+$$;
+CALL mostrar_peliculas_director(32617924);
