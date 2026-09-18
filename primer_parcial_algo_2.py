@@ -34,7 +34,10 @@ def merge_sort(lista):
             
     return lista
 
-def Canasto(c, frutas=None):
+def Canasto(frutas_elegidas, vacia=None, frutas=None):
+    if vacia is None:
+        vacia = "🧺"
+        print(vacia)
     if frutas is None:
         frutas = {
     "manzana": "🍎",
@@ -54,14 +57,14 @@ def Canasto(c, frutas=None):
     "anana": "🍍",
     "kiwi": "🥝",
     "arandano": "🫐",
-    "coco": "🥥",
+    "coco": "🥥"
     }
-    if not c:
-        return
-    if c[0] in frutas:
-        print(c[0])
-        return Canasto(c[1:], frutas=None)
-    return Canasto(c[1:], frutas=None)
+    if not frutas_elegidas:
+        return []
+    if frutas_elegidas[0] in frutas:
+        print([frutas_elegidas[0]])
+        return [frutas_elegidas[0]] + Canasto(frutas_elegidas[1:], vacia, frutas)
+    return Canasto(frutas_elegidas[1:], vacia, frutas)
 
 picnic = Canasto(["pera", "manzana"])
 print (picnic)
