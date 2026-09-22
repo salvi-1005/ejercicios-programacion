@@ -488,6 +488,8 @@ $$;
 
  SELECT calcular_sueldo(28745629);
 
+--9)
+
 CREATE OR REPLACE FUNCTION cantidad_plazas_tour(
     id_tour INT
 )
@@ -641,6 +643,8 @@ SELECT * FROM Tour;
 
 --extras
 
+--13)
+
 CREATE OR REPLACE PROCEDURE mostrar_reservas_cliente(numero_cliente INT)
 LANGUAGE plpgsql
 AS $$
@@ -668,3 +672,66 @@ END;
 $$;
 CALL mostrar_reservas_cliente(44816375);
 
+--16)
+
+CREATE OR REPLACE FUNCTION validar_fechas_tour()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    Fecha_llegada TIMESTAMP;
+BEGIN
+
+    SELECT
+    Fecha_hora_llegada
+    INTO
+    Fecha_llegada
+    FROM Tour;
+	
+    IF Fecha_llegada < CURRENT_DATE THEN
+        RAISE EXCEPTION
+        'El tour ya venció';
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_validar_fecha_vencimiento
+BEFORE INSERT OR UPDATE
+ON Reservas
+FOR EACH ROW
+EXECUTE FUNCTION validar_fechas_tour();
+
+--INSERT INTO Reservas VALUES (8018, '09-02-2026 15:30:00', 51897324, 1);
+
+--17)
+
+CREATE OR REPLACE FUNCTION insertar_tour()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+	nombre_guia VARCHAR(100);
+BEGIN
+
+	SELECT Nombre INTO nombre_guia FROM Guia_de_turismo WHERE Guia_de_turismo.ID = NEW.ID_Guia;
+	
+    RAISE NOTICE
+    'Codigo: %, Fecha de salida: %, Guia asignado: %',
+	NEW.Codigo,
+	NEW.Fecha_hora_salida,
+	nombre_guia;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_insertar_tour_nuevo
+AFTER INSERT
+ON Tour
+FOR EACH ROW
+EXECUTE FUNCTION insertar_tour();
+
+INSERT INTO Tour VALUES
+(7, '2027-04-08 12:30:00', '2027-04-11 14:30:00', 27803589);

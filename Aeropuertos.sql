@@ -19,6 +19,7 @@ DROP TABLE IF EXISTS TipoAvion CASCADE;
 DROP TABLE IF EXISTS TipoVuelo CASCADE;
 DROP TABLE IF EXISTS TipoPista CASCADE;
 DROP TABLE IF EXISTS TipoDocumento CASCADE;
+DROP TABLE IF EXISTS Auditoria_Reserva CASCADE;
 
 CREATE TABLE IF NOT EXISTS Ciudad(
     ID INT PRIMARY KEY,
@@ -323,84 +324,12 @@ CREATE TABLE IF NOT EXISTS Reserva (
         REFERENCES Vuelo(Numero_de_vuelo)
         );
 
-INSERT INTO Reserva VALUES
-(234, '2026-07-18 08:45:00', 44816375, 2464),
-(459, '2026-07-18 08:45:00', 22526104, 2464),
-(638, '2026-07-18 08:45:00', 25673509, 2464),
-(983, '2026-07-18 08:45:00', 27908312, 2464),
-(153, '2026-07-18 08:45:00', 28546732, 2464),
-(375, '2026-07-18 08:45:00', 49674109, 2464),
-(432, '2026-07-18 13:55:00', 44816375, 2028),
-(954, '2026-07-18 13:55:00', 22526104, 2028),
-(836, '2026-07-18 13:55:00', 25673509, 2028),
-(389, '2026-07-18 13:55:00', 27908312, 2028),
-(351, '2026-07-18 13:55:00', 28546732, 2028),
-(573, '2026-07-18 13:55:00', 49674109, 2028),
-(324, '2011-03-21 13:55:00', 44816375, 3196),
-(549, '2011-03-21 13:55:00', 22526104, 3196),
-(368, '2011-03-21 13:55:00', 25673509, 3196),
-(893, '2011-03-21 13:55:00', 27908312, 3196),
-(513, '2011-03-21 13:55:00', 28546732, 3196),
-(735, '2011-03-21 13:55:00', 49674109, 3196),
-(651, '2018-12-02 15:45:00', 44816375, 5198),
-(159, '2018-12-02 15:45:00', 22526104, 5198),
-(098, '2018-12-02 15:45:00', 25673509, 5198),
-(692, '2018-12-02 15:45:00', 27908312, 5198),
-(409, '2018-12-02 15:45:00', 28546732, 5198),
-(327, '2018-12-02 15:45:00', 49674109, 5198),
-(468, '2026-09-20 10:45:00', 23809424, 8374),
-(555, '2027-04-17 07:25:00', 23809424, 8374);
-
-SELECT
-    DocumentoPasajero,
-    COUNT(*) AS CantidadReservas
-FROM Reserva WHERE NumeroVuelo = 2464
-GROUP BY DocumentoPasajero
-HAVING DocumentoPasajero < 30000000
-ORDER BY CantidadReservas DESC;
-
 CREATE INDEX IF NOT EXISTS idx_pasajero_nombre
 ON Pasajero(Nombre);
 
 SELECT *
 FROM Pasajero INNER JOIN TipoDocumento ON TipoDocumento.ID = Pasajero.IdTipoDocumento
 WHERE Pasajero.Nombre = 'Hugo Lopez';
-
---Pasajeros que viajaron en vuelos Business a Madrid 
-
-CREATE INDEX IF NOT EXISTS idx_reserva_vuelo ON Reserva (NumeroVuelo, DocumentoPasajero);
-CREATE INDEX IF NOT EXISTS idx_vuelo_aeropuerto_dest ON Vuelo (IdAeropuertoDestino);
-CREATE INDEX IF NOT EXISTS idx_aeropuerto_ciudad ON Aeropuerto (IdCiudad);
-CREATE INDEX IF NOT EXISTS idx_mostrador_tipo_aerolinea ON Mostrador (IdTipo, IdAerolinea);
-
-CREATE VIEW Pasajeros_Vuelos_Business_a_Madrid AS
-SELECT DISTINCT Pasajero.NumeroDocumento, Pasajero.Nombre AS NombrePasajero, 
-TipoMostrador.Nombre AS TipoDeMostrador, Ciudad.Nombre AS NombreCiudad
-FROM Pasajero 
-INNER JOIN Reserva ON Reserva.DocumentoPasajero = Pasajero.NumeroDocumento
-INNER JOIN Vuelo ON Reserva.NumeroVuelo = Vuelo.Numero_de_vuelo
-INNER JOIN Aeropuerto ON Vuelo.IdAeropuertoDestino = Aeropuerto.ID
-INNER JOIN Aeropuerto_Aerolinea ON Aeropuerto.ID = Aeropuerto_Aerolinea.IdAeropuerto
-INNER JOIN Mostrador ON Mostrador.IdAerolinea = Aeropuerto_Aerolinea.IdAerolinea
-INNER JOIN TipoMostrador ON TipoMostrador.ID = Mostrador.IdTipo
-INNER JOIN Ciudad ON Ciudad.ID = Aeropuerto.IdCiudad
-WHERE TipoMostrador.Nombre = 'Business' AND Ciudad.Nombre = 'Madrid';
-
-SELECT * FROM Pasajeros_Vuelos_Business_a_Madrid;
-
---Reservas de Hugo López para el mes que viene
-
-SELECT Pasajero.NumeroDocumento, Pasajero.Nombre, Reserva.Codigo, Vuelo.Fecha_de_salida
-FROM Reserva
-INNER JOIN Pasajero
-    ON Pasajero.NumeroDocumento = Reserva.DocumentoPasajero
-INNER JOIN Vuelo
-    ON Reserva.NumeroVuelo = Vuelo.Numero_de_vuelo
-WHERE Pasajero.Nombre = 'Hugo Lopez'
-AND EXTRACT(YEAR FROM Vuelo.Fecha_de_salida) =
-    EXTRACT(YEAR FROM CURRENT_DATE + INTERVAL '1 month')
-AND EXTRACT(MONTH FROM Vuelo.Fecha_de_salida) =
-    EXTRACT(MONTH FROM CURRENT_DATE + INTERVAL '1 month');
 
 SELECT * FROM Aeropuerto;
 
@@ -419,8 +348,6 @@ SELECT * FROM Pista;
 SELECT * FROM UsoPista;
 
 SELECT COUNT(*) FROM Pasajero;
-
-SELECT * FROM Reserva GROUP BY Codigo, DocumentoPasajero;
 
 SELECT
     Numero_de_vuelo,
@@ -469,42 +396,6 @@ END;
 $$;
 
 CALL mostrar_pasajero(44816375);
-
---Function
-
-CREATE OR REPLACE FUNCTION pasajeros_vuelo(p_vuelo INT)
-RETURNS INT
-LANGUAGE plpgsql
-AS $$
-DECLARE cantidad INT;
-BEGIN
-    SELECT COUNT(*)
-    INTO cantidad
-    FROM Reserva
-    WHERE NumeroVuelo = p_vuelo;
-
-    RETURN cantidad;
-END;
-$$;
-
-SELECT pasajeros_vuelo(2464);
-
-CREATE OR REPLACE FUNCTION reservas_pasajero(d_pasajero INT)
-RETURNS INT
-LANGUAGE plpgsql
-AS $$
-DECLARE cantidad INT;
-BEGIN
-    SELECT COUNT(*)
-    INTO cantidad
-    FROM Reserva
-    WHERE DocumentoPasajero = d_pasajero;
-
-    RETURN cantidad;
-END;
-$$;
-
-SELECT reservas_pasajero(44816375);
 
 --Trigger
 
@@ -555,6 +446,219 @@ ON Vuelo
 FOR EACH ROW
 EXECUTE FUNCTION registrar_uso_pista();
 
+CREATE OR REPLACE FUNCTION registrar_pasajero()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    RAISE NOTICE 'Se ejecutó el trigger. NEW.ID = %', NEW.ID;
+
+    INSERT INTO Pasajero
+    VALUES(
+        22197809,
+        'Alejandro',
+        NEW.ID
+    );
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_pasajero
+AFTER INSERT
+ON TipoDocumento
+FOR EACH ROW
+EXECUTE FUNCTION registrar_pasajero();
+
+INSERT INTO TipoDocumento VALUES (4, 'Pasaporte');
+
+SELECT * FROM Pasajero;
+
+CREATE OR REPLACE FUNCTION validar_cantidad_aviones()
+RETURNS TRIGGER 
+AS $$
+BEGIN
+    IF NEW.Cant_aviones < 10 THEN
+        RAISE EXCEPTION 'Operación cancelada: Una aerolinea debe tener 10 aviones como mínimo $%', NEW.Cant_aviones;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_validar_cant_av
+BEFORE INSERT ON Aerolinea
+FOR EACH ROW
+EXECUTE FUNCTION validar_cantidad_aviones();
+
+INSERT INTO Aerolinea VALUES
+(4, 'Malasian Airlines', 11);
+
+SELECT * FROM Aerolinea;
+
+--SELECT AGE(NOW(), '2003-05-10');
+
+--extras
+
+--18)
+
+CREATE OR REPLACE FUNCTION validar_destino()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NEW.IdAeropuertoOrigen = NEW.IdAeropuertoDestino THEN
+        RAISE EXCEPTION 'El vuelo % tiene mismo origen que destino', NEW.Numero_de_vuelo;
+    END IF;
+	
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_destino
+BEFORE INSERT OR UPDATE
+ON Vuelo
+FOR EACH ROW
+EXECUTE FUNCTION validar_destino();
+
+--INSERT INTO Vuelo VALUES (9834, 2, '2027-01-18 13:20:00', '2027-01-19 01:20:00', 2, 3, 3);
+
+--21)
+
+CREATE TABLE Auditoria_Reserva(
+    ID INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+	Tipo_vuelo VARCHAR(100),
+	Fecha TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION registrar_reserva()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    tipo_de_vuelo VARCHAR(100);
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+            SELECT Nombre INTO tipo_de_vuelo FROM TipoVuelo T
+			INNER JOIN Vuelo V ON V.IdTipo = T.ID 
+			WHERE V.Numero_de_vuelo = NEW.NumeroVuelo;
+            INSERT INTO Auditoria_Reserva (ID, Tipo_vuelo, Fecha) VALUES
+			(NEW.Codigo, tipo_de_vuelo, NEW.Fecha_de_vencimiento);
+
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN 
+            DELETE FROM Auditoria_Reserva WHERE Auditoria_Reserva.ID = OLD.Codigo;
+
+    END IF;
+
+    IF TG_OP = 'UPDATE' THEN
+		IF OLD.Fecha_de_vencimiento <> NEW.Fecha_de_vencimiento THEN
+            UPDATE Auditoria_Reserva
+            SET Fecha = NEW.Fecha_de_vencimiento
+            WHERE Auditoria_Transaccion.ID = NEW.Codigo;
+
+        END IF;
+
+    END IF;
+
+    RETURN NULL;
+
+END;
+$$;
+
+CREATE TRIGGER trg_registro_de_reserva
+AFTER INSERT OR UPDATE OR DELETE
+ON Reserva
+FOR EACH ROW
+EXECUTE FUNCTION registrar_reserva();
+
+SELECT * FROM Auditoria_Reserva;
+
+SELECT
+    DocumentoPasajero,
+    COUNT(*) AS CantidadReservas
+FROM Reserva WHERE NumeroVuelo = 2464
+GROUP BY DocumentoPasajero
+HAVING DocumentoPasajero < 30000000
+ORDER BY CantidadReservas DESC;
+
+--Pasajeros que viajaron en vuelos Business a Madrid 
+
+CREATE INDEX IF NOT EXISTS idx_reserva_vuelo ON Reserva (NumeroVuelo, DocumentoPasajero);
+CREATE INDEX IF NOT EXISTS idx_vuelo_aeropuerto_dest ON Vuelo (IdAeropuertoDestino);
+CREATE INDEX IF NOT EXISTS idx_aeropuerto_ciudad ON Aeropuerto (IdCiudad);
+CREATE INDEX IF NOT EXISTS idx_mostrador_tipo_aerolinea ON Mostrador (IdTipo, IdAerolinea);
+
+CREATE VIEW Pasajeros_Vuelos_Business_a_Madrid AS
+SELECT DISTINCT Pasajero.NumeroDocumento, Pasajero.Nombre AS NombrePasajero, 
+TipoMostrador.Nombre AS TipoDeMostrador, Ciudad.Nombre AS NombreCiudad
+FROM Pasajero 
+INNER JOIN Reserva ON Reserva.DocumentoPasajero = Pasajero.NumeroDocumento
+INNER JOIN Vuelo ON Reserva.NumeroVuelo = Vuelo.Numero_de_vuelo
+INNER JOIN Aeropuerto ON Vuelo.IdAeropuertoDestino = Aeropuerto.ID
+INNER JOIN Aeropuerto_Aerolinea ON Aeropuerto.ID = Aeropuerto_Aerolinea.IdAeropuerto
+INNER JOIN Mostrador ON Mostrador.IdAerolinea = Aeropuerto_Aerolinea.IdAerolinea
+INNER JOIN TipoMostrador ON TipoMostrador.ID = Mostrador.IdTipo
+INNER JOIN Ciudad ON Ciudad.ID = Aeropuerto.IdCiudad
+WHERE TipoMostrador.Nombre = 'Business' AND Ciudad.Nombre = 'Madrid';
+
+SELECT * FROM Pasajeros_Vuelos_Business_a_Madrid;
+
+--Reservas de Hugo López para el mes que viene
+
+SELECT Pasajero.NumeroDocumento, Pasajero.Nombre, Reserva.Codigo, Vuelo.Fecha_de_salida
+FROM Reserva
+INNER JOIN Pasajero
+    ON Pasajero.NumeroDocumento = Reserva.DocumentoPasajero
+INNER JOIN Vuelo
+    ON Reserva.NumeroVuelo = Vuelo.Numero_de_vuelo
+WHERE Pasajero.Nombre = 'Hugo Lopez'
+AND EXTRACT(YEAR FROM Vuelo.Fecha_de_salida) =
+    EXTRACT(YEAR FROM CURRENT_DATE + INTERVAL '1 month')
+AND EXTRACT(MONTH FROM Vuelo.Fecha_de_salida) =
+    EXTRACT(MONTH FROM CURRENT_DATE + INTERVAL '1 month');
+
+SELECT * FROM Reserva GROUP BY Codigo, DocumentoPasajero;
+
+--Function)
+
+CREATE OR REPLACE FUNCTION pasajeros_vuelo(p_vuelo INT)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE cantidad INT;
+BEGIN
+    SELECT COUNT(*)
+    INTO cantidad
+    FROM Reserva
+    WHERE NumeroVuelo = p_vuelo;
+
+    RETURN cantidad;
+END;
+$$;
+
+SELECT pasajeros_vuelo(2464);
+
+CREATE OR REPLACE FUNCTION reservas_pasajero(d_pasajero INT)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE cantidad INT;
+BEGIN
+    SELECT COUNT(*)
+    INTO cantidad
+    FROM Reserva
+    WHERE DocumentoPasajero = d_pasajero;
+
+    RETURN cantidad;
+END;
+$$;
+
+SELECT reservas_pasajero(44816375);
+
+--Trigger)
+
 CREATE OR REPLACE FUNCTION validar_fechas_reserva()
 RETURNS TRIGGER
 LANGUAGE plpgsql
@@ -586,85 +690,41 @@ FOR EACH ROW
 EXECUTE FUNCTION validar_fechas_reserva();
 
 --INSERT INTO Reserva VALUES
---(555, '2027-04-17 07:25:00', 23809424, 8374);
+--(27, '2027-04-17 07:25:00', 23809424, 8374);
 
-CREATE OR REPLACE FUNCTION registrar_pasajero()
+--19)
+
+CREATE OR REPLACE FUNCTION actualizar_reserva()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
 
-    RAISE NOTICE 'Se ejecutó el trigger. NEW.ID = %', NEW.ID;
-
-    INSERT INTO Pasajero
-    VALUES(
-        22197809,
-        'Alejandro',
-        NEW.ID
-    );
-
-    RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_pasajero
-AFTER INSERT
-ON TipoDocumento
-FOR EACH ROW
-EXECUTE FUNCTION registrar_pasajero();
-
-INSERT INTO TipoDocumento VALUES (4, 'Pasaporte');
-
-SELECT * FROM Pasajero;
-
-CREATE OR REPLACE FUNCTION modificar_nombre()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-AS $$
-BEGIN
-
-    RAISE NOTICE 'Nombre anterior: %, Nombre nuevo: %', OLD.Nombre, NEW.Nombre;
-
-    RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER trg_mod_nombre
-BEFORE UPDATE
-ON Pasajero
-FOR EACH ROW
-EXECUTE FUNCTION modificar_nombre();
-
-UPDATE Pasajero
-SET Nombre = 'Salvador Dangelo'
-WHERE NumeroDocumento = 44816375;
-
-SELECT * FROM Pasajero;
-
-CREATE OR REPLACE FUNCTION validar_cantidad_aviones()
-RETURNS TRIGGER 
-AS $$
-BEGIN
-    IF NEW.Cant_aviones < 10 THEN
-        RAISE EXCEPTION 'Operación cancelada: Una aerolinea debe tener 10 aviones como mínimo $%', NEW.Cant_aviones;
+    IF TG_OP = 'UPDATE' AND OLD.NumeroVuelo <> NEW.NumeroVuelo THEN
+          RAISE NOTICE
+          'anterior: %, nuevo: %',
+          OLD.NumeroVuelo,
+          NEW.NumeroVuelo;
     END IF;
-    RETURN NEW;
+
+    RETURN NULL;
+
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
-CREATE TRIGGER trg_validar_cant_av
-BEFORE INSERT ON Aerolinea
+CREATE TRIGGER trg_actualizar_numero_vuelo
+AFTER INSERT OR UPDATE OR DELETE
+ON Reserva
 FOR EACH ROW
-EXECUTE FUNCTION validar_cantidad_aviones();
+EXECUTE FUNCTION actualizar_reserva();
 
-INSERT INTO Aerolinea VALUES
-(4, 'Malasian Airlines', 11);
+UPDATE Reserva
+SET NumeroVuelo = 2464
+WHERE Codigo = 893;
 
-SELECT * FROM Aerolinea;
+--Procedure)
 
---SELECT AGE(NOW(), '2003-05-10');
-
---extras
+--12)
 
 CREATE OR REPLACE PROCEDURE mostrar_pasajeros_vuelo(numero_vuelo INT)
 LANGUAGE plpgsql
@@ -694,3 +754,109 @@ BEGIN
 END;
 $$;
 CALL mostrar_pasajeros_vuelo(2464);
+
+--25)
+
+ALTER TABLE Vuelo ADD COLUMN IF NOT EXISTS Cantidad_Reservas INT DEFAULT 0;
+
+CREATE OR REPLACE FUNCTION actualizar_stock_vendido()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF TG_OP = 'INSERT' THEN
+
+        UPDATE Vuelo
+        SET Cantidad_Reservas = Cantidad_Reservas + 1
+        WHERE Vuelo.Numero_de_vuelo = NEW.NumeroVuelo;
+
+    END IF;
+
+    IF TG_OP = 'DELETE' THEN
+
+        UPDATE Vuelo
+        SET Cantidad_Reservas = Cantidad_Reservas - 1
+        WHERE Vuelo.Numero_de_vuelo = OLD.NumeroVuelo;
+
+    END IF;
+
+    IF TG_OP = 'UPDATE'
+       AND OLD.NumeroVuelo <> NEW.NumeroVuelo THEN
+		
+        UPDATE Vuelo
+        SET Cantidad_Reservas = Cantidad_Reservas + 1
+        WHERE Vuelo.Numero_de_vuelo = NEW.NumeroVuelo;
+
+        UPDATE Vuelo
+        SET Cantidad_Reservas = Cantidad_Reservas - 1
+        WHERE Vuelo.Numero_de_vuelo = OLD.NumeroVuelo;
+
+    END IF;
+
+    RETURN NEW;
+
+END;
+$$;
+
+CREATE TRIGGER trg_actualizar_stock
+AFTER INSERT OR UPDATE OR DELETE
+ON Reserva
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_stock_vendido();
+
+INSERT INTO Reserva VALUES
+(1, '2026-07-18 08:45:00', 44816375, 2464),
+(2, '2026-07-18 08:45:00', 22526104, 2464),
+(3, '2026-07-18 08:45:00', 25673509, 2464),
+(4, '2026-07-18 08:45:00', 27908312, 2464),
+(5, '2026-07-18 08:45:00', 28546732, 2464),
+(6, '2026-07-18 08:45:00', 49674109, 2464),
+(7, '2026-07-18 13:55:00', 44816375, 2028),
+(8, '2026-07-18 13:55:00', 22526104, 2028),
+(9, '2026-07-18 13:55:00', 25673509, 2028),
+(10, '2026-07-18 13:55:00', 27908312, 2028),
+(11, '2026-07-18 13:55:00', 28546732, 2028),
+(12, '2026-07-18 13:55:00', 49674109, 2028),
+(13, '2011-03-21 13:55:00', 44816375, 3196),
+(14, '2011-03-21 13:55:00', 22526104, 3196),
+(15, '2011-03-21 13:55:00', 25673509, 3196),
+(16, '2011-03-21 13:55:00', 27908312, 3196),
+(17, '2011-03-21 13:55:00', 28546732, 3196),
+(18, '2011-03-21 13:55:00', 49674109, 3196),
+(19, '2018-12-02 15:45:00', 44816375, 5198),
+(20, '2018-12-02 15:45:00', 22526104, 5198),
+(21, '2018-12-02 15:45:00', 25673509, 5198),
+(22, '2018-12-02 15:45:00', 27908312, 5198),
+(23, '2018-12-02 15:45:00', 28546732, 5198),
+(24, '2018-12-02 15:45:00', 49674109, 5198),
+(25, '2009-09-20 10:45:00', 23809424, 8374),
+(26, '2010-04-17 07:25:00', 23809424, 8374);
+
+SELECT * FROM Auditoria_Reserva;
+
+SELECT * FROM Vuelo;
+
+--19)
+
+CREATE OR REPLACE FUNCTION modificar_nombre()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+    RAISE NOTICE 'Nombre anterior: %, Nombre nuevo: %', OLD.NumeroVuelo, NEW.NumeroVuelo;
+
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER trg_mod_nombre
+BEFORE UPDATE
+ON Reserva
+FOR EACH ROW
+EXECUTE FUNCTION modificar_nombre();
+
+UPDATE Reserva
+SET NumeroVuelo = 8374
+WHERE DocumentoPasajero = 44816375;
+
