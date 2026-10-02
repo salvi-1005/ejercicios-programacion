@@ -4,160 +4,214 @@ class Nodo:
         self.izquierdo = None
         self.derecho = None
 
-def insertar(nodo_actual, valor):
-    # Caso base: si el árbol/subárbol está vacío, creamos el nodo
-    if nodo_actual is None:
-        return Nodo(valor)
-    
-    # Si el valor es menor, vamos a la izquierda
-    if valor < nodo_actual.valor:
-        nodo_actual.izquierdo = insertar(nodo_actual.izquierdo, valor)
-    # Si el valor es mayor, vamos a la derecha
-    elif valor > nodo_actual.valor:
-        nodo_actual.derecho = insertar(nodo_actual.derecho, valor)
-        
-    return nodo_actual
-
-# Uso
-raiz = None
-valores = [10, 5, 15, 3, 7]
-for v in valores:
-    raiz = insertar(raiz, v)
-
-def inorden(nodo_actual):
-    if nodo_actual is not None:
-        # 1. Recorrer subárbol izquierdo
-        inorden(nodo_actual.izquierdo)
-        # 2. Visitar nodo actual
-        print(nodo_actual.valor, end=" ")
-        # 3. Recorrer subárbol derecho
-        inorden(nodo_actual.derecho)
-
-# Muestra: 3 5 7 10 15
-inorden(raiz) 
-print()
-
-def preorden(nodo_actual):
-    if nodo_actual is not None:
-        # 1. Visitar nodo actual
-        print(nodo_actual.valor, end=" ")
-        # 2. Recorrer subárbol izquierdo
-        preorden(nodo_actual.izquierdo)
-        # 3. Recorrer subárbol derecho
-        preorden(nodo_actual.derecho)
-        
-# Muestra: 10 5 3 7 15
-preorden(raiz)
-print()  
-        
-def postorden(nodo_actual):
-    if nodo_actual is not None:
-        # 1. Recorrer subárbol izquierdo
-        postorden(nodo_actual.izquierdo)
-        # 2. Recorrer subárbol derecho
-        postorden(nodo_actual.derecho)
-        # 3. Visitar nodo actual
-        print(nodo_actual.valor, end=" ")
-        
-# Muestra: 3 7 5 15 10
-postorden(raiz)
-print()
-
-def calcular_altura(nodo_actual):
-    # Caso base: un árbol vacío tiene altura 0
-    if nodo_actual is None:
-        return 0
-    
-    # Calcular la altura de cada subárbol
-    altura_izquierda = calcular_altura(nodo_actual.izquierdo)
-    altura_derecha = calcular_altura(nodo_actual.derecho)
-    
-    # La altura actual es 1 (el nodo actual) más la altura del hijo más alto
-    return 1 + max(altura_izquierda, altura_derecha)
-
-print(f"altura máxima: {calcular_altura(raiz)}")
-print()
-
-def encontrar_minimo(nodo_actual):
-    # Función auxiliar para buscar el nodo más a la izquierda (el menor)
-    while nodo_actual.izquierdo is not None:
-        nodo_actual = nodo_actual.izquierdo
-    return nodo_actual
-
-def eliminar_nodo(nodo_actual, valor_a_eliminar):
-    # Caso base: el árbol está vacío o el valor no existe
-    if nodo_actual is None:
-        return None
-
-    # 1. Buscar el nodo a eliminar en los subárboles
-    if valor_a_eliminar < nodo_actual.valor:
-        nodo_actual.izquierdo = eliminar_nodo(nodo_actual.izquierdo, valor_a_eliminar)
-    elif valor_a_eliminar > nodo_actual.valor:
-        nodo_actual.derecho = eliminar_nodo(nodo_actual.derecho, valor_a_eliminar)
-    
-    # 2. ¡Encontramos el nodo a eliminar!
-    else:
-        # Caso 1 y 2: Sin hijos o con un solo hijo (derecho)
+class ABB:
+    def __init__(self):
+        self.raiz = None
+    # ======================
+    # INSERCIÓN
+    # ======================
+    def insertar(self, valor):
+        self.raiz = self._insertar(self.raiz, valor)
+    def _insertar(self, nodo_actual, valor):
+        if nodo_actual is None:
+            return Nodo(valor)
+        if valor < nodo_actual.valor:
+            nodo_actual.izquierdo = self._insertar(nodo_actual.izquierdo, valor)
+        elif valor > nodo_actual.valor:
+            nodo_actual.derecho = self._insertar(nodo_actual.derecho, valor)
+        return nodo_actual
+    # ======================
+    # RECORRIDOS
+    # ======================
+    def inorden(self):
+        self._inorden(self.raiz)
+        print()
+    def _inorden(self, nodo_actual):
+        if nodo_actual is not None:
+            self._inorden(nodo_actual.izquierdo)
+            print(nodo_actual.valor, end=" ")
+            self._inorden(nodo_actual.derecho)
+    def preorden(self):
+        self._preorden(self.raiz)
+        print()
+    def _preorden(self, nodo_actual):
+        if nodo_actual is not None:
+            print(nodo_actual.valor, end=" ")
+            self._preorden(nodo_actual.izquierdo)
+            self._preorden(nodo_actual.derecho)
+    def postorden(self):
+        self._postorden(self.raiz)
+        print()
+    def _postorden(self, nodo_actual):
+        if nodo_actual is not None:
+            self._postorden(nodo_actual.izquierdo)
+            self._postorden(nodo_actual.derecho)
+            print(nodo_actual.valor, end=" ")
+    def ordenar_de_mayor_a_menor(self):
+        self._ordenar_de_mayor_a_menor(self.raiz)
+        print()
+    def _ordenar_de_mayor_a_menor(self, nodo_actual):
+        if nodo_actual is not None:
+            self._ordenar_de_mayor_a_menor(nodo_actual.derecho)
+            print(nodo_actual.valor, end=" ")
+            self._ordenar_de_mayor_a_menor(nodo_actual.izquierdo)
+    # ======================
+    # BÚSQUEDA
+    # ======================
+    def buscar(self, valor):
+        return self._buscar(self.raiz, valor)
+    def _buscar(self, nodo_actual, valor):
+        if nodo_actual is None:
+            return False
+        if nodo_actual.valor == valor:
+            return True
+        if valor < nodo_actual.valor:
+            return self._buscar(nodo_actual.izquierdo, valor)
+        return self._buscar(nodo_actual.derecho, valor)
+    def buscar_nodo(self, valor):
+        return self._buscar_nodo(self.raiz, valor)
+    def _buscar_nodo(self, nodo_actual, valor):
+        if nodo_actual is None or nodo_actual.valor == valor:
+            return nodo_actual
+        if valor < nodo_actual.valor:
+            return self._buscar_nodo(nodo_actual.izquierdo, valor)
+        return self._buscar_nodo(nodo_actual.derecho, valor)
+    # ======================
+    # ALTURA
+    # ======================
+    def altura(self):
+        return self._altura(self.raiz)
+    def _altura(self, nodo_actual):
+        if nodo_actual is None:
+            return 0
+        return 1 + max(self._altura(nodo_actual.izquierdo), self._altura(nodo_actual.derecho))
+    # ======================
+    # CANTIDAD DE NODOS
+    # ======================
+    def cantidad_nodos(self):
+        return self._cantidad_nodos(self.raiz)
+    def _cantidad_nodos(self, nodo_actual):
+        if nodo_actual is None:
+            return 0
+        return (1 + self._cantidad_nodos(nodo_actual.izquierdo) + 
+                self._cantidad_nodos(nodo_actual.derecho))
+    # ======================
+    # AUXILIARES ELIMINACIÓN
+    # ======================
+    def _encontrar_maximo_nodo(self, nodo):
+        if nodo.derecho is None:
+            return nodo
+        return self._encontrar_maximo_nodo(nodo.derecho)
+    def _encontrar_minimo_nodo(self, nodo):
+        if nodo.izquierdo is None:
+            return nodo
+        return self._encontrar_minimo_nodo(nodo.izquierdo)
+    # ======================
+    # ELIMINACIÓN POR FUSIÓN
+    # ======================
+    def eliminar_fusion(self, valor):
+        self.raiz = self._eliminar_fusion(self.raiz, valor)
+    def _eliminar_fusion(self, nodo_actual, valor_a_eliminar):
+        if nodo_actual is None:
+            return None
+        if valor_a_eliminar < nodo_actual.valor:
+            nodo_actual.izquierdo = self._eliminar_fusion(nodo_actual.izquierdo,valor_a_eliminar)
+            return nodo_actual
+        if valor_a_eliminar > nodo_actual.valor:
+            nodo_actual.derecho = self._eliminar_fusion(nodo_actual.derecho, valor_a_eliminar)
+            return nodo_actual
+        # Encontramos el nodo
         if nodo_actual.izquierdo is None:
             return nodo_actual.derecho
-        
-        # Caso 2: Con un solo hijo (izquierdo)
-        elif nodo_actual.derecho is None:
+        if nodo_actual.derecho is None:
             return nodo_actual.izquierdo
-
-        # Caso 3: El nodo tiene DOS hijos
-        # Buscamos el nodo más pequeño del subárbol derecho
-        sucesor = encontrar_minimo(nodo_actual.derecho)
-        # Reemplazamos el valor del nodo actual por el del sucesor
-        nodo_actual.valor = sucesor.valor
-        # Eliminamos recursivamente el sucesor en el subárbol derecho
-        nodo_actual.derecho = eliminar_nodo(nodo_actual.derecho, sucesor.valor)
-
-    return nodo_actual
-
-# Ejemplo de uso en la raíz de tu árbol actual
-print("Estructura original (Preorden):")
-preorden(raiz)
-print()
-
-# Supongamos que queremos borrar el nodo 5 (que tiene dos hijos: 3 y 7)
-raiz = eliminar_nodo(raiz, 5)
-
-print("Estructura tras eliminar el 5 (Preorden):")
-preorden(raiz)
-print()
-
-
-def buscar_nodo(nodo_actual, valor_a_buscar):
-    # Caso base 1: El nodo es None (el valor no está en el árbol)
-    # Caso base 2: Encontramos el nodo con el valor buscado
-    if nodo_actual is None or nodo_actual.valor == valor_a_buscar:
+        # Caso de dos hijos → FUSIÓN
+        maximo_izq = self._encontrar_maximo_nodo(nodo_actual.izquierdo)
+        maximo_izq.derecho = nodo_actual.derecho
+        return nodo_actual.izquierdo
+    # ======================
+    # ELIMINACIÓN POR COPIA
+    # ======================
+    def eliminar_copia(self, valor):
+        self.raiz = self._eliminar_copia(self.raiz, valor)
+    def _eliminar_copia(self, nodo_actual, valor_a_eliminar):
+        if nodo_actual is None:
+            return None
+        if valor_a_eliminar < nodo_actual.valor:
+            nodo_actual.izquierdo = self._eliminar_copia(nodo_actual.izquierdo, valor_a_eliminar)
+        elif valor_a_eliminar > nodo_actual.valor:
+            nodo_actual.derecho = self._eliminar_copia(nodo_actual.derecho, valor_a_eliminar)
+        else:
+            # Sin hijo izquierdo
+            if nodo_actual.izquierdo is None:
+                return nodo_actual.derecho
+            # Sin hijo derecho
+            if nodo_actual.derecho is None:
+                return nodo_actual.izquierdo
+            # Dos hijos → COPIA DEL SUCESOR
+            sucesor = self._encontrar_minimo_nodo(nodo_actual.derecho)
+            nodo_actual.valor = sucesor.valor
+            nodo_actual.derecho = self._eliminar_copia(nodo_actual.derecho, sucesor.valor)
         return nodo_actual
+    # ======================
+    # MÍNIMO Y MÁXIMO
+    # ======================
+    def minimo(self):
+        return self._minimo(self.raiz)
+    def _minimo(self, nodo_actual):
+        if nodo_actual.izquierdo is None:
+            return nodo_actual.valor
+        return self._minimo(nodo_actual.izquierdo)
+    def maximo(self):
+        return self._maximo(self.raiz)
+    def _maximo(self, nodo_actual):
+        if nodo_actual.derecho is None:
+            return nodo_actual.valor
+        return self._maximo(nodo_actual.derecho)
+    # ======================
+    # MENORES A UN VALOR
+    # ======================
+    def menores_a(self, dato):
+        return self._menores_a(self.raiz, dato)
+    def _menores_a(self, nodo_actual, dato):
+        if nodo_actual is None:
+            return []
+        if nodo_actual.valor >= dato:
+            return self._menores_a(nodo_actual.izquierdo, dato)
+        return (self._menores_a(nodo_actual.izquierdo, dato) + 
+                [nodo_actual.valor] + self._menores_a(nodo_actual.derecho, dato))
     
-    # Si el valor es menor, buscamos recursivamente en la izquierda
-    if valor_a_buscar < nodo_actual.valor:
-        return buscar_nodo(nodo_actual.izquierdo, valor_a_buscar)
-    
-    # Si el valor es mayor, buscamos recursivamente en la derecha
-    return buscar_nodo(nodo_actual.derecho, valor_a_buscar)
+arbol = ABB()
 
-# Definimos el número que queremos buscar
-numero = 7
+for v in [10, 5, 15, 3, 7]:
+    arbol.insertar(v)
 
-# Llamamos a la función de búsqueda
-resultado = buscar_nodo(raiz, numero)
+print("Inorden:")
+arbol.inorden()
 
-# Evaluamos e imprimimos el resultado
-if resultado is not None:
-    print(f"El elemento {numero} SÍ existe en el árbol.")
-else:
-    print(f"El elemento {numero} NO se encuentra en el árbol.")
+print("Preorden:")
+arbol.preorden()
 
-def cantidadDeNodos(nodo_actual):
-    if nodo_actual is None:
-        return 0
-    return 1 + cantidadDeNodos(nodo_actual.izquierdo) + cantidadDeNodos(nodo_actual.derecho)
+print("Postorden:")
+arbol.postorden()
 
-print(f"La cantidad de nodos del arbol es: ")
-print(cantidadDeNodos(raiz))
+print("Mayor a menor:")
+arbol.ordenar_de_mayor_a_menor()
+
+print("Altura:")
+print(arbol.altura())
+
+dato = 7
+print(f"Está el {dato}?")
+print(arbol.buscar(dato))
+
+print("Mínimo:")
+print(arbol.minimo())
+
+print("Máximo:")
+print(arbol.maximo())
+
+dato = 10
+print(f"Elementos menores a {dato}:")
+print(arbol.menores_a(dato))
 
