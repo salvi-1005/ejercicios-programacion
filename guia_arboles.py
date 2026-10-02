@@ -1482,3 +1482,83 @@ arbol_genericos2.mostrar()
 dato = 'Ignacio'
 print(f"Arbol sin {dato}")
 print(arbol_genericos2.eliminarOrdenado(dato))
+
+#16)
+class ABBArreglo:
+    def __init__(self, capacidad):
+        self.valores = [None] * capacidad
+        self.izq = [-1] * capacidad
+        self.der = [-1] * capacidad
+        self.raiz = -1
+        self.libre = 0
+    def insertar(self, elemento):
+        if self.raiz == -1:
+            self.raiz = 0
+            self.valores[0] = elemento
+            self.libre = 1
+            return
+        self._insertar(self.raiz, elemento)
+    def _insertar(self, actual, elemento):
+        if elemento < self.valores[actual]:
+            if self.izq[actual] == -1:
+                nuevo = self.libre
+                self.valores[nuevo] = elemento
+                self.izq[actual] = nuevo
+                self.libre += 1
+                return
+            return self._insertar(self.izq[actual], elemento)
+        else:
+            if self.der[actual] == -1:
+                nuevo = self.libre
+                self.valores[nuevo] = elemento
+                self.der[actual] = nuevo
+                self.libre += 1
+                return
+            return self._insertar(self.der[actual],elemento)
+    def eliminar(self, elemento):
+        self._eliminar(self.raiz, elemento)
+    def _eliminar(self, actual, elemento):
+        if elemento < self.valores[actual]:
+            if self.izq[actual] != -1:
+                nuevo = self.libre
+                self.valores[nuevo] = None
+                self.izq[actual] = -1
+                self.libre -= 1
+                return
+            return self._eliminar(self.izq[actual], elemento)
+        if elemento > self.valores[actual]:
+            if self.der[actual] != -1:
+                nuevo = self.libre
+                self.valores[nuevo] = None
+                self.der[actual] = -1
+                self.libre -= 1
+                return
+            return self._eliminar(self.izq[actual], elemento)
+            
+    def __str__(self):
+        return (f"valores={self.valores}\n"f"izq={self.izq}\n"f"der={self.der}\n"f"raiz={self.raiz}")
+        
+arbol = ABBArreglo(10)
+
+arbol.insertar(6)
+print(arbol)
+
+arbol.insertar(4)
+print(arbol)
+
+arbol.insertar(8)
+print(arbol)
+
+arbol.insertar(3)
+print(arbol)
+        
+class Nodo:
+
+    def __init__(self, valor):
+
+        self.valor = valor
+
+        self.izquierdo = None
+        self.derecho = None
+
+        self.siguiente = None
