@@ -59,6 +59,12 @@ picnic = Canasto(lista_frutas)
 print("Todas las combinaciones posibles del canasto:")
 print (picnic)
 
+#---------------------------------------------------------------------------------
 
+class Canasto:
+    def __str__():
+        return
+    def __add__():
+        return
 
 
