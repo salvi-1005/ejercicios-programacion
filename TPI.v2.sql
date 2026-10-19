@@ -1,9 +1,10 @@
 -- ============================================================================
--- LIMPIEZA DE TABLAS RESTRUCTURADAS (Ecosistema de 11 Tablas Definitivas)
+-- LIMPIEZA DE TABLAS RESTRUCTURADAS (Ecosistema de 13 Tablas Definitivas)
 -- ============================================================================
 DROP TABLE IF EXISTS Detalle_Pedido CASCADE;
 DROP TABLE IF EXISTS Pedido CASCADE;
 DROP TABLE IF EXISTS Producto CASCADE;
+DROP TABLE IF EXISTS Marca CASCADE;
 DROP TABLE IF EXISTS Reserva CASCADE;
 DROP TABLE IF EXISTS Cancha CASCADE;
 DROP TABLE IF EXISTS Tipo_Cancha CASCADE;
@@ -18,6 +19,7 @@ DROP TABLE IF EXISTS Especialidad CASCADE;
 DROP TYPE IF EXISTS tipo_estado_cancha CASCADE;
 DROP TYPE IF EXISTS tipo_estado_reserva CASCADE;
 DROP TYPE IF EXISTS tipo_estado_pedido CASCADE;
+DROP TYPE IF EXISTS tipo_estado_profesor CASCADE;
 
 -- ============================================================================
 -- 1. CREACIÓN DE TIPOS PERSONALIZADOS (ENUMs)
@@ -25,6 +27,7 @@ DROP TYPE IF EXISTS tipo_estado_pedido CASCADE;
 CREATE TYPE tipo_estado_cancha AS ENUM ('Disponible', 'En Mantenimiento');
 CREATE TYPE tipo_estado_reserva AS ENUM ('Pendiente', 'Confirmado', 'Rechazado');
 CREATE TYPE tipo_estado_pedido AS ENUM ('Pendiente', 'Entregado', 'Cancelado');
+CREATE TYPE tipo_estado_profesor AS ENUM ('Disponible', 'Ocupado', 'Baja');
 
 -- ============================================================================
 -- 2. MÓDULO PERSONAS Y DEUDAS (5 Tablas)
@@ -77,7 +80,7 @@ CREATE TABLE Profesor (
     id_especialidad INT NOT NULL,
     fecha_nacimiento DATE NOT NULL,
     email VARCHAR(100),
-    estado VARCHAR(50) NOT NULL DEFAULT 'Disponible',
+    estado tipo_estado_profesor NOT NULL DEFAULT 'Disponible',
     FOREIGN KEY (id_especialidad) REFERENCES Especialidad(id_especialidad)
 );
 
@@ -138,16 +141,23 @@ CREATE TABLE Reserva (
 -- 4. MÓDULO BUFFET / BAR UNIFICADO (3 Tablas)
 -- ============================================================================
 
--- Tabla 10: Inventario General del Buffet Central (Con Atributo Marca)
+-- Tabla 10: Insertamos las marcas en su tabla independiente
+CREATE TABLE Marca (
+    id_marca INT PRIMARY KEY,
+    nombre_marca VARCHAR(100) NOT NULL 
+);
+
+-- Tabla 11. Insertamos los productos apuntando a sus respectivas marcas
 CREATE TABLE Producto (
     id_producto INT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     precio_venta DECIMAL NOT NULL,
-    marca VARCHAR(50), -- Nuevo atributo descriptivo atómico en perfecta 3FN
-    stock_actual INT NOT NULL DEFAULT 0 CHECK (stock_actual >= 0)
+    id_marca INT NOT NULL, 
+    stock_actual INT NOT NULL DEFAULT 0 CHECK (stock_actual >= 0),
+    FOREIGN KEY (id_marca) REFERENCES Marca(id_marca)
 );
 
--- Tabla 11: Comandas del Bar (Soporta Clientes Cruzados y Externos)
+-- Tabla 12: Comandas del Bar (Soporta Clientes Cruzados y Externos)
 CREATE TABLE Pedido (
     id_pedido INT PRIMARY KEY,
     fecha_hora_pedido TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -159,7 +169,7 @@ CREATE TABLE Pedido (
     FOREIGN KEY (id_profesor) REFERENCES Profesor(id_profesor)
 );
 
--- Tabla 12: Renglones del Ticket de Venta
+-- Tabla 13: Renglones del Ticket de Venta
 CREATE TABLE Detalle_Pedido (
     id_detalle INT PRIMARY KEY,
     cantidad INT NOT NULL CHECK (cantidad > 0),
@@ -171,7 +181,7 @@ CREATE TABLE Detalle_Pedido (
 );
 
 -- ============================================================================
--- INSERCIÓN DE DATOS DE PRUEBA (Consistencia entre las 11 Tablas)
+-- INSERCIÓN DE DATOS DE PRUEBA (Consistencia entre las 13 Tablas)
 -- ============================================================================
 
 -- 1. TABLAS MAESTRAS DE CONFIGURACIÓN
@@ -225,10 +235,15 @@ INSERT INTO Reserva (id_reserva, fecha_reserva, id_socio, id_cancha, id_profesor
 -- Caso 3: El Profesor López reserva la pista sola para su práctica personal (Socio en NULL y precio bonificado)
 (5003, '2026-10-20', NULL, 2, 100, '09:00:00', '10:30:00', 'Confirmado', 0.00, NULL, TRUE);
 -- 6. CATÁLOGO CON MARCAS Y TICKETS DEL BUFFET CENTRAL
-INSERT INTO Producto (id_producto, nombre, precio_venta, marca, stock_actual) VALUES
-(1, 'Café en Jarrito', 2500.00, 'Bonafide', 120),
-(2, 'Gaseosa Cola 500ml', 3000.00, 'Coca-Cola', 45),
-(3, 'Agua Mineral 500ml', 2200.00, 'Kin', 8);
+INSERT INTO Marca (id_marca, nombre_marca) VALUES
+(1, 'Bonafide'),
+(2, 'Coca-Cola'),
+(3, 'Kin');
+
+INSERT INTO Producto (id_producto, nombre, precio_venta, id_marca, stock_actual) VALUES
+(1, 'Café en Jarrito', 2500.00, 1, 120),
+(2, 'Gaseosa Cola 500ml', 3000.00, 2, 45),
+(3, 'Agua Mineral 500ml', 2200.00, 3, 8);
 -- Comandas cruzadas con enums de cocina unificados
 INSERT INTO Pedido (id_pedido, fecha_hora_pedido, nro_mesa, estado_pedido, id_socio, id_profesor) VALUES
 (10, '2026-10-18 13:05:00', 3, 'Pendiente', 1, NULL),
@@ -300,6 +315,58 @@ END IF;
 RAISE NOTICE '======================================================================';
 END;
 $$;
+
+CREATE OR REPLACE PROCEDURE cancelar_pedido(p_id_pedido INT)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_fila RECORD;
+    v_existe_pedido BOOLEAN;
+    v_estado_actual VARCHAR(50);
+BEGIN
+    -- 1. Verificamos si el pedido existe y cuál es su estado actual
+    SELECT EXISTS(SELECT 1 FROM Pedido WHERE id_pedido = p_id_pedido) INTO v_existe_pedido;
+    
+    IF NOT v_existe_pedido THEN
+        RAISE EXCEPTION 'Error: El Pedido Nro % no existe en el sistema.', p_id_pedido;
+    END IF;
+
+    SELECT estado_pedido::VARCHAR INTO v_estado_actual FROM Pedido WHERE id_pedido = p_id_pedido;
+
+    -- 2. Si el pedido ya estaba cancelado, no hacemos nada
+    IF v_estado_actual = 'Cancelado' THEN
+        RAISE NOTICE 'El Pedido Nro % ya se encuentra cancelado.', p_id_pedido;
+        RETURN;
+    END IF;
+
+    -- 3. Recorremos los renglones del detalle para DEVOLVER el stock al buffet
+    FOR v_fila IN 
+        SELECT id_producto, cantidad 
+        FROM Detalle_Pedido 
+        WHERE id_pedido = p_id_pedido
+    LOOP
+        UPDATE Producto
+        SET stock_actual = stock_actual + v_fila.cantidad
+        WHERE id_producto = v_fila.id_producto;
+    END LOOP;
+
+    -- 4. Modificamos el estado del pedido a 'Cancelado'
+    UPDATE Pedido
+    SET estado_pedido = 'Cancelado'
+    WHERE id_pedido = p_id_pedido;
+
+    RAISE NOTICE '¡Éxito! El Pedido Nro % ha sido cancelado y su mercadería fue reincorporada al stock.', p_id_pedido;
+END;
+$$;
+
+SELECT nombre, stock_actual FROM Producto WHERE id_producto = 3; -- Devuelve 8 unidades
+
+CALL cancelar_pedido(30);
+-- Verás el mensaje: NOTICE: ¡Éxito! El Pedido Nro 30 ha sido cancelado...
+
+SELECT estado_pedido FROM Pedido WHERE id_pedido = 30; -- Ahora figura 'Cancelado'
+SELECT nombre, stock_actual FROM Producto WHERE id_producto = 3; -- ¡Ahora figura 9 unidades!
+
 -- Función Escalar: Calcula el aforo presencial de socios en tiempo real desde el historial
 CREATE OR REPLACE FUNCTION socios_actuales_en_club()
 RETURNS INT
@@ -316,6 +383,38 @@ WHERE id_socio IS NOT NULL AND fecha_hora_salida IS NULL;
 RETURN v_cantidad_presentes;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION canchas_libres_actualmente()
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_cantidad_libres INT := 0;
+    v_fecha_hoy DATE;
+    v_hora_hoy TIME;
+BEGIN
+    -- 1. Capturamos el momento exacto del reloj del servidor
+    v_fecha_hoy := NOW()::DATE;
+    v_hora_hoy := NOW()::TIME;
+
+    -- 2. Contamos usando LEFT JOIN puro para evitar subconsultas
+    SELECT COUNT(c.id_cancha) 
+    INTO v_cantidad_libres
+    FROM Cancha c
+    LEFT JOIN Reserva r ON c.id_cancha = r.id_cancha 
+                       AND r.fecha_reserva = v_fecha_hoy
+                       AND r.estado = 'Confirmado'
+                       AND v_hora_hoy BETWEEN r.hora_inicio AND r.hora_fin
+    WHERE c.estado_cancha = 'Disponible'
+      AND r.id_reserva IS NULL; -- Si el ID de reserva es NULL, significa que la cancha está LIBRE ahora
+
+    RETURN v_cantidad_libres;
+END;
+$$;
+
+SELECT canchas_libres_actualmente() AS total_canchas_libres_hoy;
+
+
 -- Trigger Function: Valida deudas financieras del socio en la base de datos antes de destrabar el molinete
 CREATE OR REPLACE FUNCTION validar_ingreso_molinete()
 RETURNS TRIGGER
@@ -396,9 +495,9 @@ FOR EACH ROW
 EXECUTE FUNCTION proteger_monto_total_reserva();
 
 -- Intentemos "dibujar" el ticket 9001 (que era de $3000) para decir que se cobró $1000
---UPDATE Detalle_Pedido 
---SET precio_unitario_historico = 1000.00 
---WHERE id_detalle = 9001;
+--UPDATE Reserva 
+--SET monto_total = 100000.00 
+--WHERE id_reserva = 5001;
 
 CREATE OR REPLACE FUNCTION proteger_monto_pagado_cuota()
 RETURNS TRIGGER
@@ -416,11 +515,16 @@ BEGIN
 END;
 $$;
 
--- 2. El disparador asociado a tu tabla Reserva
+-- 2. El disparador asociado a tu tabla Cuota_Mensual
 CREATE TRIGGER trg_bloquear_cambio_monto_pagado
 BEFORE UPDATE OF monto_pagado ON Cuota_Mensual
 FOR EACH ROW
 EXECUTE FUNCTION proteger_monto_pagado_cuota();
+
+-- Intentemos "dibujar" el ticket 9001 (que era de $3000) para decir que se cobró $1000
+--UPDATE Cuota_Mensual
+--SET monto_pagado = 10000.00 
+--WHERE id_cuota = 1002;
 
 -- ============================================================================
 -- EJECUCIÓN DE PRUEBAS DE COMPONENTES
