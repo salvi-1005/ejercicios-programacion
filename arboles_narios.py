@@ -32,6 +32,11 @@ class ArbolN( Generic[T]):
     def es_hoja(self) -> bool:    
         return self.subarboles == []
     
+    def _altura_funcional(self, nodo):
+        if nodo.es_hoja():
+            return 0
+        return 1 + reduce(max, [self._altura_funcional(s) for s in nodo.subarboles])
+    
     def altura_recursion_multiple(self) -> int: 
         if self.es_hoja(): 
             return 1 
@@ -49,8 +54,36 @@ class ArbolN( Generic[T]):
             if not bosque: 
                 return 0 
             else: 
-                return max(bosque[0].altura(), altura_n(bosque[1 :])) 
+                return max(bosque[0].altura(), altura_n(bosque[1:])) 
         return 1 + altura_n( self .subarboles)
+    
+    def altura_rec(self):
+        return self._altura(self)
+
+    def _altura(self, nodo):
+        if nodo.es_hoja():
+            return 0
+        return 1 + self._max_altura(nodo.subarboles, 0)
+    
+    def cantidad_nodos(self):
+        return self._cantidad_nodos(self)
+
+    def _cantidad_nodos(self, nodo):
+        if nodo.es_hoja():
+            return 1
+        return 1 + self._sumar_nodos(nodo.subarboles, 0)
+
+    def _sumar_nodos(self, subarboles, i):
+        if i == len(subarboles):
+            return 0
+        return (self._cantidad_nodos(subarboles[i]) + self._sumar_nodos(subarboles,i + 1))
+    
+    def _max_altura(self, lista_subarboles, i):
+        if i == len(lista_subarboles) - 1:
+            return self._altura(lista_subarboles[i])
+        altura_actual = self._altura(lista_subarboles[i])
+        altura_resto = self._max_altura(lista_subarboles, i + 1)
+        return max(altura_actual, altura_resto)
     
     def preorder_funcional( self ) -> List [T]:
         return reduce(lambda recorrido, subarbol: recorrido + subarbol.preorder(), self .subarboles, [self.dato])
@@ -69,9 +102,35 @@ class ArbolN( Generic[T]):
                 return bosque[0].preorder() + preorder_n(bosque[1:])
         return [self.dato] + preorder_n(self.subarboles)
         
+    def inorder(self):
+        if self.es_hoja():
+            return [self.dato]
+        return (self.subarboles[0].inorder() + [self.dato] + self._inorder_resto(self.subarboles,1))
+
+    def _inorder_resto(self, bosque, i):
+        if i >= len(bosque):
+            return []
+        return (bosque[i].inorder() + self._inorder_resto(bosque, i + 1))
+    
     def postorder_funcional( self ) -> List [T]:
         return reduce(lambda recorrido, subarbol: recorrido + \
                       subarbol.postorden(), self .subarboles, [self.dato])
+            
+    def inorder_imperativo(self):
+        recorrido = []
+        if self.subarboles:
+            recorrido += (self.subarboles[0].inorder_imperativo())
+        recorrido.append(self.dato)
+        for subarbol in self.subarboles[1:]:
+            recorrido += (subarbol.inorder_imperativo())
+        return recorrido
+    
+    def inorder_funcional(self):
+        if not self.subarboles:
+            return [self.dato]
+        primero = (self.subarboles[0].inorder_funcional())
+        resto = reduce(lambda rec, sub: rec + sub.inorder_funcional(), self.subarboles[1:], [])
+        return (primero + [self.dato] + resto)
     
     def postorder_imperativo(self) -> List [T]:    
         recorrido = [self .dato] 
@@ -102,7 +161,8 @@ class ArbolN( Generic[T]):
         return copia
     
     def __str__(self):
-        return f"Preorden: {str(self.preorder())}, Postorden: {str(self.postorder())}"
+        return f"Preorden: {str(self.preorder())}, Postorden: {str(self.postorder())}, \
+            Inorden: {str(self.inorder())}"
     
     def sin_hojas(self):
         if self.es_hoja():
@@ -159,6 +219,8 @@ nodo5.subarboles = [nodo3, nodo7]
 
 raiz.subarboles = [nodo5, nodo15, nodo20]
 
+print(raiz.cantidad_nodos())
+
 print(raiz.nivel(3))
 copia = raiz.copiar()
 print(copia)
@@ -190,3 +252,4 @@ direcciones = [0,1]
 recorrido = raiz.recorrido_guiado(direcciones)
 print(f"Recorrido guiado por {direcciones}")
 print(recorrido)
+

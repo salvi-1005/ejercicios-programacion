@@ -1,6 +1,194 @@
 import heapq
 
-class Grafo:
+#Versión Conjunto de nodos y aristas
+
+class Grafo1:
+    def __init__(self):
+        self.conjunto_adyacencias = set()
+        self.conjunto_vertices = set()
+    def agregar_vertice(self, vertice):
+        # Si el nodo no existe, lo creamos con una lista vacía de vecinos
+        if vertice not in self.conjunto_vertices:
+            self.conjunto_vertices.add(vertice)
+    def agregar_arista(self, inicio, fin, bidireccional=True):
+        # Aseguramos que ambos nodos existan en el grafo
+        self.agregar_vertice(inicio)
+        self.agregar_vertice(fin)
+            
+        # Conectamos inicio -> fin
+        self.conjunto_adyacencias.add((inicio, fin))
+            
+        if bidireccional:
+            self.conjunto_adyacencias.add((fin, inicio))
+    def eliminar_vertice(self, vertice, aristas=None):
+        if aristas is None:
+            aristas = list(self.conjunto_adyacencias)
+        if not aristas:
+            return
+        # Si el nodo existe, lo borramos 
+        if vertice in self.conjunto_vertices:
+            self.conjunto_vertices.remove(vertice)
+        #Si el vertice está involucrado en alguna conexión, borro esa conexión, sino, sigo de largo.
+        if vertice in aristas[0]:
+            self.conjunto_adyacencias.remove(aristas[0])
+            return self.eliminar_vertice(vertice, aristas[1:])
+        return self.eliminar_vertice(vertice, aristas[1:])
+    def eliminar_arista(self, arista, bidireccional=True):
+        if arista in self.conjunto_adyacencias:
+            self.conjunto_adyacencias.remove(arista)
+            if bidireccional and arista[::-1] in self.conjunto_adyacencias:
+                self.conjunto_adyacencias.remove(arista[::-1])
+    def es_vecino_de(self, vertice1, vertice2, aristas=None):
+        if aristas is None:
+            aristas = list(self.conjunto_adyacencias)
+        if not aristas:
+            return False
+        if (vertice1, vertice2) == aristas[0] or (vertice2, vertice1) == aristas[0]:
+            return True
+        return self.es_vecino_de(vertice1, vertice2, aristas[1:])
+    def vecinos_de(self, vertice, bidireccional=True, aristas=None, res=None):
+        if aristas is None:
+            aristas = list(self.conjunto_adyacencias)
+        if res is None:
+            res = []
+        if not aristas:
+            return res
+        if aristas[0][0] == vertice:
+            if aristas[0][1] not in res:
+                res.append(aristas[0][1])
+            return self.vecinos_de(vertice, bidireccional, aristas[1:], res)
+        if bidireccional:
+            if aristas[0][1] == vertice:
+                if aristas[0][0] not in res:
+                    res.append(aristas[0][0])
+                return self.vecinos_de(vertice, bidireccional, aristas[1:], res)
+        return self.vecinos_de(vertice, bidireccional, aristas[1:], res)
+    
+    def dfs(self, origen):
+        return self._dfs(origen, set())
+    def _dfs(self, origen, visitados):
+        if origen in visitados:
+            return []
+        visitados.add(origen)
+        return [origen] + self._dfs_vecinos(origen, list(self.conjunto_adyacencias), visitados)
+    def _dfs_vecinos(self, origen, aristas, visitados):
+        if aristas == []:
+            return []
+        inicio, fin = aristas[0]
+        if inicio == origen:
+            return (self._dfs(fin, visitados) + self._dfs_vecinos(origen, aristas[1:], visitados))
+        return self._dfs_vecinos(origen, aristas[1:], visitados)
+    def bfs(self, origen):
+        return self._bfs([origen], set())
+    def _bfs(self, cola, visitados):
+        if cola == []:
+            return []
+        vertice = cola[0]
+        cola = cola[1:]
+        if vertice in visitados:
+            return self._bfs(cola, visitados)
+        visitados.add(vertice)
+        vecinos = self.vecinos_de(vertice)
+        return ([vertice] + self._bfs(cola + vecinos, visitados))
+    
+    def existe_camino(self, origen, destino, visitados=None):
+        if visitados is None:
+            visitados = set()
+        if origen == destino:
+            return True
+        visitados.add(origen)
+        return self._explorar_aristas(list(self.conjunto_adyacencias), origen, destino, visitados)
+    def _explorar_aristas(self, aristas, origen, destino, visitados):
+        if aristas == []:
+            return False
+        inicio, fin = aristas[0]
+        if inicio == origen and fin not in visitados:
+            if self.existe_camino(fin, destino, visitados):
+                return True
+        return self._explorar_aristas(aristas[1:], origen, destino, visitados)
+    def __str__(self):
+        return f"Aristas:{str(self.conjunto_adyacencias)}, vértices:{str(self.conjunto_vertices)}"
+        
+g = Grafo1()
+
+g.agregar_vertice("A")
+g.agregar_vertice("B")
+g.agregar_vertice("C")
+g.agregar_vertice("D")
+g.agregar_vertice("E")
+g.agregar_vertice("F")
+
+g.agregar_arista("A", "B")
+g.agregar_arista("A", "C")
+g.agregar_arista("C", "D")
+g.agregar_arista("D", "B")
+g.agregar_arista("E", "F")
+
+print("Versión Conjunto de aristas y vértices")
+
+print(g)
+
+print("Vértices: ")
+print(g.conjunto_vertices)
+
+print("Aristas: ")
+print(g.conjunto_adyacencias)
+
+vertice1 = "A"
+vertice2 = "B"
+print(f"¿{vertice1} es vecino de {vertice2}?: {g.es_vecino_de(vertice1, vertice2)}")
+
+vertice = "B"
+print(f"Vecinos de {vertice}: {g.vecinos_de(vertice)}")
+
+origen = "A"
+print("Recorrido DFS:")
+print(g.dfs(origen))
+
+origen = "A"
+print("Recorrido BFS:")
+print(g.bfs(origen))
+
+origen = "A"
+destino = "C"
+print(f"Existe camino de {origen} a {destino}? {g.existe_camino(origen, destino)}")
+
+print(set(g.dfs("A")) == {"A","B","C","D"})
+print(set(g.bfs("A")) == {"A","B","C","D"})
+
+g.eliminar_vertice("A")
+g.eliminar_arista(("C", "D"))
+
+print("Después de eliminar: ")
+
+print("Vértices después de eliminar el A: ")
+print(g.conjunto_vertices)
+
+print("Aristas después de eliminar el (C, D): ")
+print(g.conjunto_adyacencias)
+
+vertice1 = "A"
+vertice2 = "B"
+print(f"¿{vertice1} es vecino de {vertice2}?: {g.es_vecino_de(vertice1, vertice2)}")
+
+vertice = "B"
+print(f"Vecinos de {vertice}: {g.vecinos_de(vertice)}")
+
+origen = "A"
+print("Recorrido DFS:")
+print(g.dfs(origen))
+
+origen = "A"
+print("Recorrido BFS:")
+print(g.bfs(origen))
+
+origen = "A"
+destino = "C"
+print(f"Existe camino de {origen} a {destino}? {g.existe_camino(origen, destino)}")
+
+#Versión lista de adyacencia
+
+class Grafo2:
     def __init__(self):
         # El diccionario almacenará: { nodo: [vecino1, vecino2, ...] }
         self.lista_adyacencia = {}
@@ -21,22 +209,226 @@ class Grafo:
         # Si es un grafo no dirigido (bidireccional), conectamos fin -> inicio
         if bidireccional:
             self.lista_adyacencia[fin].append(inicio)
+            
+    def eliminar_vertice(self, vertice, lista_vertices=None):
+        if lista_vertices is None:
+            lista_vertices = list(self.lista_adyacencia)
+        if not lista_vertices:
+            return
+        # Si el nodo existe, lo borramos 
+        if vertice in self.lista_adyacencia:
+            del self.lista_adyacencia[vertice]
+            lista_vertices.remove(vertice)
+        #Si el vertice está involucrado en alguna conexión, borro esa conexión, sino, sigo de largo.
+        if vertice in self.lista_adyacencia[lista_vertices[0]]:
+            self.lista_adyacencia[lista_vertices[0]].remove(vertice)
+            return self.eliminar_vertice(vertice, lista_vertices[1:])
+        return self.eliminar_vertice(vertice, lista_vertices[1:])
+    
+    def eliminar_arista(self, inicio, fin, lista_vertices=None):
+        if lista_vertices is None:
+            lista_vertices = list(self.lista_adyacencia)
+        if not lista_vertices:
+            return
+        # Si alguno de los dos extremos de la arista no existe, no la borro
+        if inicio not in self.lista_adyacencia or fin not in self.lista_adyacencia:
+            return
+        # Si la arista que quiero borrar no existe, no hago nada
+        if fin not in self.lista_adyacencia[inicio] and \
+            inicio not in self.lista_adyacencia[fin]:
+            return
+        if lista_vertices[0] == inicio:
+            self.lista_adyacencia[lista_vertices[0]].remove(fin)
+            return self.eliminar_arista(inicio, fin, lista_vertices[1:])
+        if lista_vertices[0] == fin:
+            self.lista_adyacencia[lista_vertices[0]].remove(inicio)
+            return self.eliminar_arista(inicio, fin, lista_vertices[1:])
+        return self.eliminar_arista(inicio, fin, lista_vertices[1:])
+    
+    def es_vecino_de(self, vertice1, vertice2, bidireccional=True):
+        if vertice1 not in self.lista_adyacencia:
+            return False
+        if bidireccional and vertice2 not in self.lista_adyacencia:
+            return False
+        if bidireccional:
+            return (vertice2 in self.lista_adyacencia[vertice1] or \
+            vertice1 in self.lista_adyacencia[vertice2])
+        return vertice2 in self.lista_adyacencia[vertice1]
+    
+    def vecinos_de(self, vertice):
+        return self.lista_adyacencia[vertice]
+            
+    def hay_camino(self, origen, destino, visitados=None):
+        if visitados is None:
+            visitados = set()
+        if origen == destino:
+            return True
+        visitados.add(origen)
+        return self._explorar_vecinos(self.lista_adyacencia[origen], destino, visitados)
 
-    def mostrar_grafo(self):
-        for vertice, vecinos in self.lista_adyacencia.items():
-            print(f"{vertice} -> {vecinos}")
+    def _explorar_vecinos(self, vecinos, destino, visitados, i=0):
+        if i >= len(vecinos):
+            return False
+        vecino = vecinos[i]
+        if vecino not in visitados:
+            if self.hay_camino(vecino, destino, visitados):
+                return True
+        return self._explorar_vecinos(vecinos, destino,visitados, i + 1)
 
-g = Grafo()
+    def __str__(self):
+        return f"Lista de adyacencia: {str(self.lista_adyacencia)}"
+
+g = Grafo2()
+
+g.agregar_vertice("A")
+g.agregar_vertice("B")
+g.agregar_vertice("C")
+g.agregar_vertice("D")
+
 g.agregar_arista("A", "B")
 g.agregar_arista("A", "C")
-g.agregar_arista("B", "D")
+g.agregar_arista("C", "D")
+g.agregar_arista("D", "B")
 
-g.mostrar_grafo()
-# Salida en consola:
-# A -> ['B', 'C']
-# B -> ['A', 'D']
-# C -> ['A']
-# D -> ['B']
+print("Versión lista de adyacencia: ")
+
+print(g)
+
+vertice1 = "B"
+vertice2 = "D"
+print(f"¿{vertice1} es vecino de {vertice2}?: {g.es_vecino_de(vertice1, vertice2)}")
+
+vertice = "B"
+print(f"Vecinos de {vertice}: {g.vecinos_de(vertice)}")
+
+g.eliminar_vertice("A")
+g.eliminar_arista("B", "D")
+
+print("Después de eliminar: ")
+
+print(g)
+
+vertice1 = "B"
+vertice2 = "D"
+print(f"¿{vertice1} es vecino de {vertice2}?: {g.es_vecino_de(vertice1, vertice2)}")
+
+vertice = "B"
+print(f"Vecinos de {vertice}: {g.vecinos_de(vertice)}")
+
+class Grafo3:
+    def __init__(self):
+        self.vertices = []
+        self.matriz = []
+        
+    def agregar_vertice(self, vertice):
+        if vertice in self.vertices:
+            return
+        self.vertices.append(vertice)
+        self._agregar_columna(self.matriz)
+        self.matriz.append([0] * len(self.vertices))
+        
+    def _agregar_columna(self, filas):
+        if not filas:
+            return
+        filas[0].append(0)
+        self._agregar_columna(filas[1:])
+
+    def agregar_arista(self, inicio, fin, bidireccional=True):
+        self.agregar_vertice(inicio)
+        self.agregar_vertice(fin)
+        i = self.vertices.index(inicio)
+        j = self.vertices.index(fin)
+        self.matriz[i][j] = 1
+        if bidireccional:
+            self.matriz[j][i] = 1
+            
+    def eliminar_vertice(self, vertice):
+        if vertice not in self.vertices:
+            return
+        i = self.vertices.index(vertice)
+        self.vertices.pop(i)
+        self.matriz.pop(i)
+        self._eliminar_columna(self.matriz, i)
+    
+    def _eliminar_columna(self, filas, i):
+        if not filas:
+            return
+        filas[0].pop(i)
+        self._eliminar_columna(filas[1:], i)
+    
+    def eliminar_arista(self, inicio, fin, bidireccional=True):
+        if not inicio in self.vertices or not fin in self.vertices:
+            return
+        i = self.vertices.index(inicio)
+        j = self.vertices.index(fin)
+        if self.matriz[i][j] == 0:
+            return
+        self.matriz[i][j] = 0
+        if bidireccional:
+            self.matriz[j][i] = 0
+        
+    def es_vecino_de(self, vertice1, vertice2, bidireccional=True):
+        if vertice1 not in self.vertices or vertice2 not in self.vertices:
+            return False
+        i = self.vertices.index(vertice1)
+        j = self.vertices.index(vertice2)
+        if bidireccional and (self.matriz[i][j] == 0 or self.matriz[j][i] == 0):
+            return False
+        if not bidireccional and self.matriz[i][j] == 0 and self.matriz[j][i] == 0:
+            return False
+        return True
+    
+    def vecinos_de(self, vertice, j=0, fila=None):
+        if vertice not in self.vertices:
+            return []
+        i = self.vertices.index(vertice)
+        if fila is None:
+            fila = self.matriz[i]
+        if j == len(fila):
+            return []
+        if fila[j] == 1:
+            return [self.vertices[j]] + self.vecinos_de(vertice, j+1, fila)
+        return self.vecinos_de(vertice, j+1, fila)
+    
+    def __str__(self):
+        return f"Vértices: {str(self.vertices)}, Matriz de adyacencia: {str(self.matriz)}"
+    
+g = Grafo3()
+
+g.agregar_vertice("A")
+g.agregar_vertice("B")
+g.agregar_vertice("C")
+g.agregar_vertice("D")
+
+g.agregar_arista("A", "B")
+g.agregar_arista("A", "C")
+g.agregar_arista("C", "D")
+g.agregar_arista("D", "B")
+
+print("Versión matriz de adyacencia: ")
+
+print(g)
+
+vertice1 = "B"
+vertice2 = "D"
+print(f"¿{vertice1} es vecino de {vertice2}?: {g.es_vecino_de(vertice1, vertice2)}")
+
+vertice = "B"
+print(f"Vecinos de {vertice}: {g.vecinos_de(vertice)}")
+
+g.eliminar_vertice("A")
+g.eliminar_arista("B", "D")
+
+print("Después de eliminar: ")
+
+print(g)
+
+vertice1 = "B"
+vertice2 = "D"
+print(f"¿{vertice1} es vecino de {vertice2}?: {g.es_vecino_de(vertice1, vertice2)}")
+
+vertice = "B"
+print(f"Vecinos de {vertice}: {g.vecinos_de(vertice)}")
 
 def dijkstra(grafo, nodo_inicio):
     # 1. Inicializar las distancias de todos los nodos como infinitas (float('inf'))
@@ -81,7 +473,7 @@ def obtener_camino_exacto(padres, destino):
     return camino
 
 # Creamos el mapa
-mapa = Grafo()
+mapa = Grafo2()
 mapa.agregar_arista("A", "B", 4)  # Ruta A-B: 4km
 mapa.agregar_arista("A", "C", 2)  # Ruta A-C: 2km
 mapa.agregar_arista("C", "B", 1)  # Ruta C-B: 1km (Desvío más corto para ir de A a B)
@@ -89,14 +481,14 @@ mapa.agregar_arista("B", "D", 5)  # Ruta B-D: 5km
 mapa.agregar_arista("C", "D", 8)  # Ruta C-D: 8km
 
 # Ejecutamos Dijkstra saliendo desde la ciudad "A"
-distancias_minimas, arbol_padres = dijkstra(mapa, "A")
+#distancias_minimas, arbol_padres = dijkstra(mapa, "A")
 
 # Consultamos los resultados para llegar a la ciudad "D"
 destino_final = "D"
-print(f"Distancia mínima desde A hasta {destino_final}: {distancias_minimas[destino_final]} km")
+#print(f"Distancia mínima desde A hasta {destino_final}: {distancias_minimas[destino_final]} km")
 
-ruta_optima = obtener_camino_exacto(arbol_padres, destino_final)
-print(f"Ruta óptima a seguir: {' -> '.join(ruta_optima)}")
+#ruta_optima = obtener_camino_exacto(arbol_padres, destino_final)
+#print(f"Ruta óptima a seguir: {' -> '.join(ruta_optima)}")
 
 # Salida esperada en consola:
 # Distancia mínima desde A hasta D: 8 km

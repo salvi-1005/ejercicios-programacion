@@ -24,7 +24,7 @@ class Canasto:
     def __init__(self, frutas_elegidas):
         self.frutas_elegidas = frutas_elegidas
     def __str__(self):
-        return self._mostrar(self._partes(self.frutas_elegidas))
+        return self._mostrar(self._partes(self.frutas_elegidas)) 
     def _partes(self, lista):
         if not lista:
             return [[]]
@@ -46,8 +46,19 @@ class Canasto:
         if resto == "":
             return actual
         return actual + "\n" + resto
+    def __add__(self, nuevo_canasto, nueva_lista=None):
+        if nueva_lista is None:
+            nueva_lista = self.frutas_elegidas + nuevo_canasto.frutas_elegidas
+        if not nueva_lista:
+            return ''
+        return str(self.frutas[nueva_lista[0]]) + self.__add__(nuevo_canasto, nueva_lista[1:])
+
 
 picnic = Canasto(["pera", "manzana"])
+
+print(picnic)
+
+picnic = Canasto(["pera", "manzana"]) + Canasto(["banana", "durazno"])
 
 print(picnic)
 
