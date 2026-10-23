@@ -161,7 +161,7 @@ CREATE TABLE Producto (
 CREATE TABLE Pedido (
     id_pedido INT PRIMARY KEY,
     fecha_hora_pedido TIMESTAMP NOT NULL DEFAULT NOW(),
-    nro_mesa INT NOT NULL,
+    nro_mesa INT,
     estado_pedido tipo_estado_pedido NOT NULL DEFAULT 'Pendiente',
     id_socio INT,
     id_profesor INT,
@@ -229,7 +229,7 @@ INSERT INTO Cancha (id_cancha, nombre_cancha, id_tipo_cancha, estado_cancha) VAL
 -- Carga transaccional de reservas (Casos: Socio Solo, Clase Particular y Profesor Solo)
 INSERT INTO Reserva (id_reserva, fecha_reserva, id_socio, id_cancha, id_profesor, hora_inicio, hora_fin, estado, monto_total, fecha_pago, pagado) VALUES
 -- Caso 1: Turno de fútbol de amigos del Socio 1 (Profesor en NULL)
-(5001, '2026-10-19', 1, 1, NULL, '19:00:00', '20:00:00', 'Confirmado', 15000.00, '2026-10-18 12:00:00', TRUE),
+(5001, '2026-10-19', 1, 1, NULL, '20:00:00', '21:00:00', 'Confirmado', 15000.00, '2026-10-18 12:00:00', TRUE),
 -- Caso 2: Alumno Gómez toma clase con el Profesor López ($10.000 la hora x 1.5 horas = $15.000)
 (5002, '2026-10-19', 2, 2, 100, '18:00:00', '19:30:00', 'Confirmado', 15000.00, NULL, FALSE),
 -- Caso 3: El Profesor López reserva la pista sola para su práctica personal (Socio en NULL y precio bonificado)
@@ -414,6 +414,52 @@ $$;
 
 SELECT canchas_libres_actualmente() AS total_canchas_libres_hoy;
 
+CREATE OR REPLACE FUNCTION calcular_precio_reserva(p_id_cancha INT, p_hora_inicio TIME, p_duracion_horas DECIMAL)
+RETURNS INT
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    monto_total DECIMAL;
+BEGIN
+    IF p_hora_inicio >= '20:00:00' THEN
+	    SELECT precio_por_hora * p_duracion_horas + (0.2 * precio_por_hora * p_duracion_horas) INTO monto_total
+		FROM Cancha c INNER JOIN Tipo_Cancha t ON t.id_tipo_cancha = c.id_tipo_cancha
+		INNER JOIN Reserva r ON r.id_cancha = c.id_cancha
+		WHERE c.id_cancha = p_id_cancha AND r.hora_inicio = p_hora_inicio;
+	ELSE
+	    SELECT precio_por_hora * p_duracion_horas INTO monto_total
+		FROM Cancha c INNER JOIN Tipo_Cancha t ON t.id_tipo_cancha = c.id_tipo_cancha
+		INNER JOIN Reserva r ON r.id_cancha = c.id_cancha
+		WHERE c.id_cancha = p_id_cancha AND r.hora_inicio = p_hora_inicio;
+    END IF;
+	RETURN monto_total;
+END;
+$$;
+
+SELECT calcular_precio_reserva(1, '20:00:00', 1);
+
+CREATE OR REPLACE FUNCTION socio_esta_al_dia(p_id_socio INT)
+RETURNS BOOLEAN
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    esta_al_dia BOOLEAN;
+	mes_cuota INT;
+BEGIN
+	SELECT c.pagado, c.mes 
+	INTO esta_al_dia, mes_cuota
+	FROM Socio s INNER JOIN Cuota_Mensual c ON c.id_socio = s.id_socio
+	WHERE s.id_socio = p_id_socio;
+
+	IF EXTRACT(MONTH FROM NOW()) <= mes_cuota THEN
+	    esta_al_dia := TRUE;
+	END IF;
+
+	RETURN esta_al_dia;
+END;
+$$;
+
+SELECT socio_esta_al_dia(1);
 
 -- Trigger Function: Valida deudas financieras del socio en la base de datos antes de destrabar el molinete
 CREATE OR REPLACE FUNCTION validar_ingreso_molinete()
