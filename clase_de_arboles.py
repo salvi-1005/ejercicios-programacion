@@ -554,3 +554,164 @@ def busqueda_binaria(a, x, lista=None):
 x = 7
 print(f"Indice del elemento {x}: {busqueda_binaria(a, x)}")
 print(f"Indice del elemento {x}: {a.busqueda_binaria(x)}")
+
+
+
+class Binary_Min_Heap:
+    def __init__(self):
+        self.heap = []
+    def insertar(self, valor):
+        self.heap.append(valor)
+        self._heapify_up(len(self.heap) - 1)
+    def _heapify_up(self, indice):
+        if indice == 0:
+            return
+        padre = (indice - 1) // 2
+        if self.heap[indice] < self.heap[padre]:
+            self.heap[indice], self.heap[padre] = self.heap[padre], self.heap[indice]
+            self._heapify_up(padre)
+    def minimo(self):
+        if not self.heap:
+            return None
+        return self.heap[0]
+    def eliminar_minimo(self):
+        if not self.heap:
+            return None
+        minimo = self.heap[0]
+        ultimo = self.heap.pop()
+        if self.heap:
+            self.heap[0] = ultimo
+            self._heapify_down(0)
+        return minimo
+    def eliminar(self, valor):
+        if valor not in self.heap:
+            return False
+        indice = self.heap.index(valor)
+        ultimo = self.heap.pop()
+        if indice < len(self.heap):
+            self.heap[indice] = ultimo
+            padre = (indice - 1) // 2
+            if indice > 0 and self.heap[indice] < self.heap[padre]:
+                self._heapify_up(indice)
+            else:
+                self._heapify_down(indice)
+        return True
+    def _heapify_down(self, indice):
+        izquierdo = 2 * indice + 1
+        derecho = 2 * indice + 2
+        menor = indice
+        if izquierdo < len(self.heap) and self.heap[izquierdo] < self.heap[menor]:
+           menor = izquierdo
+        if derecho < len(self.heap) and self.heap[derecho] < self.heap[menor]:
+            menor = derecho
+        if menor != indice:
+            self.heap[indice], self.heap[menor] = self.heap[menor], self.heap[indice]
+            self._heapify_down(menor)
+    def es_vacio(self):
+        return self.heap == []
+    def tamaño(self):
+        return len(self.heap)
+    def __str__(self):
+        return str(self.heap)
+
+h = Binary_Min_Heap()
+
+h.insertar(8)
+h.insertar(3)
+h.insertar(5)
+h.insertar(1)
+
+print("Heap min: ")
+
+print(h)
+
+print("Elimino el 1: ")
+h.eliminar_minimo()
+
+print(h)
+
+print("Elimino el 5: ")
+h.eliminar(5)
+
+print(h)
+
+class Binary_Max_Heap:
+    def __init__(self):
+        self.heap = []
+    def insertar(self, valor):
+        self.heap.append(valor)
+        self._heapify_up(len(self.heap) - 1)
+    def _heapify_up(self, indice):
+        if indice == 0:
+            return
+        padre = (indice - 1) // 2
+        if self.heap[indice] > self.heap[padre]:
+            self.heap[indice], self.heap[padre] = self.heap[padre], self.heap[indice]
+            self._heapify_up(padre)
+    def maximo(self):
+        if not self.heap:
+            return None
+        return self.heap[0]
+    def eliminar_maximo(self):
+        if not self.heap:
+            return None
+        maximo = self.heap[0]
+        ultimo = self.heap.pop()
+        if self.heap:
+            self.heap[0] = ultimo
+            self._heapify_down(0)
+        return maximo
+    def eliminar(self, valor):
+        if valor not in self.heap:
+            return False
+        indice = self.heap.index(valor)
+        ultimo = self.heap.pop()
+        if indice < len(self.heap):
+            self.heap[indice] = ultimo
+            padre = (indice - 1) // 2
+            if indice > 0 and self.heap[indice] > self.heap[padre]:
+                self._heapify_up(indice)
+            else:
+                self._heapify_down(indice)
+        return True
+    def _heapify_down(self, indice):
+        izquierdo = 2 * indice + 1
+        derecho = 2 * indice + 2
+        mayor = indice
+        if izquierdo < len(self.heap) and self.heap[izquierdo] > self.heap[mayor]:
+           mayor = izquierdo
+        if derecho < len(self.heap) and self.heap[derecho] > self.heap[mayor]:
+            mayor = derecho
+        if mayor != indice:
+            self.heap[indice], self.heap[mayor] = self.heap[mayor], self.heap[indice]
+            self._heapify_down(mayor)
+    def es_vacio(self):
+        return self.heap == []
+    def tamaño(self):
+        return len(self.heap)
+    def __str__(self):
+        return str(self.heap)
+
+    
+h = Binary_Max_Heap()
+
+h.insertar(8)
+h.insertar(3)
+h.insertar(5)
+h.insertar(1)
+
+print("Heap max: ")
+
+print(h)
+
+print("Elimino el 8: ")
+h.eliminar_maximo()
+
+print(h)
+
+print("Elimino el 3: ")
+h.eliminar(3)
+
+print(h)
+
+#skip-list (insertar, borrar y buscar). random skip list

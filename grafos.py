@@ -1,4 +1,5 @@
 import heapq
+from guia_arboles import arbol_binario_genericos, Nodo
 
 #Versión Conjunto de nodos y aristas
 
@@ -198,9 +199,12 @@ print(f"Existe camino de {origen} a {destino}? {g.existe_camino(origen, destino)
 #Versión lista de adyacencia
 
 class Grafo2:
-    def __init__(self):
+    def __init__(self, lista_adyacencia=None):
         # El diccionario almacenará: { nodo: [vecino1, vecino2, ...] }
-        self.lista_adyacencia = {}
+        if lista_adyacencia is None:
+            self.lista_adyacencia = {}
+        else:
+            self.lista_adyacencia = lista_adyacencia
 
     def agregar_vertice(self, vertice):
         # Si el nodo no existe, lo creamos con una lista vacía de vecinos
@@ -399,11 +403,12 @@ class Grafo2:
         return self._bfs(resto + self.lista_adyacencia[actual], visitados, recorrido + [actual])
     def conectados(self, origen):
         return self.dfs(origen)
-    def es_conexo(self, vertices=None):
-        if vertices is None:
-            vertices = list(self.lista_adyacencia)
-        if not vertices:
+    def es_conexo(self):
+        if not self.lista_adyacencia:
             return True
+        origen = list(self.lista_adyacencia)[0]
+        visitados = self.dfs(origen)
+        return len(visitados) == len(self.lista_adyacencia)
     def vecinos(self, vertice):
         return self.lista_adyacencia[vertice]
     def camino_sin_ciclos(self, inicio, fin, visitados=None):
@@ -422,6 +427,7 @@ class Grafo2:
             if camino:
                 return [actual] + camino
         return self._camino_sin_ciclos_vecinos(actual, destino, vecinos[1:], visitados)
+    
     def __str__(self):
         return f"Lista de adyacencia: {str(self.lista_adyacencia)}"
 
@@ -461,6 +467,9 @@ print(g.bfs("A"))
 
 print("Camino sin ciclos: ")
 print(g.camino_sin_ciclos("A", "D"))
+
+print("¿Es conexo el grafo 2?")
+print(g.es_conexo())
 
 print("Versión lista de adyacencia: ")
 
@@ -505,14 +514,14 @@ class Grafo3:
         filas[0].append(0)
         self._agregar_columna(filas[1:])
 
-    def agregar_arista(self, inicio, fin, bidireccional=True):
+    def agregar_arista(self, inicio, fin, peso, bidireccional=True):
         self.agregar_vertice(inicio)
         self.agregar_vertice(fin)
         i = self.vertices.index(inicio)
         j = self.vertices.index(fin)
-        self.matriz[i][j] = 1
+        self.matriz[i][j] = peso
         if bidireccional:
-            self.matriz[j][i] = 1
+            self.matriz[j][i] = peso
             
     def eliminar_vertice(self, vertice):
         if vertice not in self.vertices:
@@ -635,10 +644,10 @@ g.agregar_vertice("D")
 
 g.listar_nodos()
 
-g.agregar_arista("A", "B")
-g.agregar_arista("A", "C")
-g.agregar_arista("C", "D")
-g.agregar_arista("D", "B")
+g.agregar_arista("A", "B", 4)
+g.agregar_arista("A", "C", 7)
+g.agregar_arista("C", "D", 1)
+g.agregar_arista("D", "B", 8)
 
 origen = "A"
 longitud = 3
@@ -745,17 +754,39 @@ class GrafoDirigido:
         # El diccionario guardará: {nodo_origen: [(nodo_destino, peso), ...]}
         self.grafo = {}
         self.aristas = []
-
-    def agregar_arista(self, u, v, peso):
+    def agregar_vertice(self, u):
         if u not in self.grafo:
             self.grafo[u] = []
-        if v not in self.grafo:
-            self.grafo[v] = []
+    def agregar_arista(self, u, v, peso=None):
+        self.agregar_vertice(u)
+        self.agregar_vertice(v)
+        if peso is None:
+            self.grafo[u].append(v)
+            self.aristas.append((u, v))
             
         self.grafo[u].append((v, peso))
         # Guardamos una lista plana de aristas para facilitar Bellman-Ford
         self.aristas.append((u, v, peso))
-        
+    def agregar_arista_orientada(self, arista):
+        self.agregar_vertice(arista[0])
+        self.agregar_vertice(arista[1])
+        if len(arista) == 2:
+            self.grafo[arista[0]].append(arista[1])
+            self.aristas.append(arista)
+        else:
+            self.grafo[arista[0]].append((arista[1], arista[2]))
+            # Guardamos una lista plana de aristas para facilitar Bellman-Ford
+            self.aristas.append(arista)
+    def agregar_lista_vertices(self, lista):
+        if not lista:
+            return 
+        self.agregar_vertice(lista[0])
+        self.agregar_lista_vertices(lista[1:])
+    def agregar_aristas_orientadas(self, lista):
+        if not lista:
+            return 
+        self.agregar_arista_orientada(lista[0])
+        self.agregar_aristas_orientadas(lista[1:])
     def eliminar_arista(self, arista):
         if arista not in self.aristas:
             return
@@ -838,6 +869,8 @@ class GrafoDirigido:
         return self._camino_sin_ciclos_vecinos(actual, destino, vecinos[1:], visitados)
     def __str__(self):
         return str(self.grafo)
+    def __repr__(self):
+        return str(self.grafo)
 
 # --- Pruebas con el ejemplo numérico ---
 g = GrafoDirigido()
@@ -872,6 +905,20 @@ if resultados:
     for nodo, dist in resultados.items():
         print(f"Hasta {nodo}: {dist}")
 
+class UnionFind:
+    def __init__(self, vertices):
+        self.parent = {v: v for v in vertices}
+    def find(self, x):
+        if self.parent[x] == x:
+            return x
+        return self.find(self.parent[x])
+    def union(self, x, y):
+        raiz_x = self.find(x)
+        raiz_y = self.find(y)
+        if raiz_x != raiz_y:
+            self.parent[raiz_y] = raiz_x
+            
+
 import heapq
 
 class GrafoPonderado:
@@ -883,11 +930,14 @@ class GrafoPonderado:
         if vertice not in self.lista_adyacencia:
             self.lista_adyacencia[vertice] = []
 
-    def agregar_arista(self, inicio, fin, peso, bidireccional=True):
+    def agregar_arista(self, inicio, fin, peso=None, bidireccional=False):
         # Aseguramos que ambos nodos existan en el grafo
         self.agregar_vertice(inicio)
         self.agregar_vertice(fin)
-        
+        if peso is None:
+            self.lista_adyacencia[inicio].append(fin)
+            if bidireccional:
+                self.lista_adyacencia[fin].append(inicio)
         # Conectamos inicio -> fin
         self.lista_adyacencia[inicio].append((fin, peso))
         
@@ -983,7 +1033,8 @@ class GrafoPonderado:
         if not self.lista_adyacencia:
             return True
         origen = list(self.lista_adyacencia)[0]
-        return len(self.dfs(origen)) == len(self.lista_adyacencia)
+        visitados = self.dfs(origen)
+        return len(visitados) == len(self.lista_adyacencia)
     def vecinos(self, vertice):
         return self._vecinos(self.lista_adyacencia[vertice])
     def _vecinos(self, lista):
@@ -991,6 +1042,13 @@ class GrafoPonderado:
             return []
         vecino, peso = lista[0]
         return [vecino] + self._vecinos(lista[1:])
+    def vecinos_con_peso(self, vertice):
+        return self._vecinos_con_peso(self.lista_adyacencia[vertice])
+    def _vecinos_con_peso(self, lista):
+        if not lista:
+            return []
+        vecino, peso = lista[0]
+        return [vecino] + self._vecinos_con_peso(lista[1:])
     def dfs(self, origen):
         return self._dfs(origen, set())
     def _dfs(self, actual, visitados):
@@ -1035,8 +1093,265 @@ class GrafoPonderado:
         i = camino.index(arco[0])
         j = camino.index(arco[1])
         return abs(i - j) > 1
+    def buscar_elemento(self, lista_tuplas, elemento):
+        if not lista_tuplas:
+            return False
+        if elemento in lista_tuplas[0]:
+            return True
+        return self.buscar_elemento(lista_tuplas[1:], elemento)
+    def es_vecino_de(self, vertice1, vertice2, bidireccional=False):
+        if vertice1 not in self.lista_adyacencia:
+            return False
+        if bidireccional and vertice2 not in self.lista_adyacencia:
+            return False
+        if bidireccional:
+            return (self.buscar_elemento(self.lista_adyacencia[vertice1], vertice2) or \
+            self.buscar_elemento(self.lista_adyacencia[vertice2], vertice1))
+        return self.buscar_elemento(self.lista_adyacencia[vertice1], vertice2)
+    def devolver_primer_elemento(self, lista_tuplas):
+        if not lista_tuplas:
+            return []
+        return [lista_tuplas[0][0]] + self.devolver_primer_elemento(lista_tuplas[1:])
+    def vecinos_de(self, vertice):
+        return self.devolver_primer_elemento(self.lista_adyacencia[vertice])
+    def _agregar_actual(self, actual, caminos):
+        if not caminos:
+            return []
+        return ([[actual] + caminos[0]] + self._agregar_actual(actual, caminos[1:]))
+    def _explorar_vecinos3(self, actual, destino, vecinos, visitados):
+        if not vecinos:
+            return []
+        vecino = vecinos[0]
+        caminos = []
+        if vecino not in visitados:
+            caminos_vecino = self._todos_los_caminos(vecino, destino, visitados | {vecino})
+            caminos = self._agregar_actual(actual, caminos_vecino)
+        return (caminos + self._explorar_vecinos3(actual, destino, vecinos[1:], visitados))
+    def todos_los_caminos(self, origen, destino):
+        return self._todos_los_caminos(origen, destino, {origen})
+    def _todos_los_caminos(self, actual, destino, visitados):
+        if actual == destino:
+            return [[actual]]
+        return self._explorar_vecinos3(actual, destino, self.vecinos(actual), visitados)
+    def peso_camino(self, camino):
+        if len(camino) <= 1:
+            return 0
+        return (self.peso_arista(camino[0], camino[1]) + self.peso_camino(camino[1:]))
+    def peso_arista(self, origen, destino, l_vecinos=None):
+        if l_vecinos is None:
+            l_vecinos = self.lista_adyacencia[origen]
+        if not l_vecinos:
+            return None
+        if destino in l_vecinos[0]:
+            return l_vecinos[0][1]
+        return self.peso_arista(origen, destino, l_vecinos[1:])
+    def caminos_con_peso(self, origen, destino, l_caminos=None):
+        if l_caminos is None:
+            l_caminos = self.todos_los_caminos(origen, destino)
+        if not l_caminos:
+            return []
+        return [(l_caminos[0], self.peso_camino(l_caminos[0]))] + \
+            self.caminos_con_peso(origen, destino, l_caminos[1:])
+    def camino_mas_liviano(self, origen, destino, l_caminos=None):
+        if l_caminos is None:
+            l_caminos = self.caminos_con_peso(origen, destino)
+        if not l_caminos:
+            return []
+        if len(l_caminos) == 1:
+            return l_caminos[0]
+        if self.camino_mas_liviano(origen, destino, l_caminos[1:])[1] == []:
+            return l_caminos[0]
+        if l_caminos[0][1] < self.camino_mas_liviano(origen, destino, l_caminos[1:])[1]:
+            return l_caminos[0]
+        return self.camino_mas_liviano(origen, destino, l_caminos[1:])
+    def camino_mas_pesado(self, origen, destino, l_caminos=None):
+        if l_caminos is None:
+            l_caminos = self.caminos_con_peso(origen, destino)
+        if not l_caminos:
+            return []
+        if len(l_caminos) == 1:
+            return l_caminos[0]
+        if self.camino_mas_pesado(origen, destino, l_caminos[1:])[1] == []:
+            return l_caminos[0]
+        if l_caminos[0][1] > self.camino_mas_pesado(origen, destino, l_caminos[1:])[1]:
+            return l_caminos[0]
+        return self.camino_mas_pesado(origen, destino, l_caminos[1:])
+    def aristas(self):
+        return self._aristas(list(self.lista_adyacencia), [], set())
+    def _aristas(self, vertices, res, vistas):
+        if not vertices:
+            return res
+        return self._aristas_vertice(vertices[0], self.lista_adyacencia[vertices[0]],
+            res, vistas, vertices[1:])
+    def _aristas_vertice(self, origen, vecinos, res, vistas, resto_vertices):
+        if not vecinos:
+            return self._aristas(resto_vertices, res, vistas)
+        destino, peso = vecinos[0]
+        arista = tuple(sorted([origen, destino]))
+        if arista not in vistas:
+            vistas.add(arista)
+            res.append((origen, destino, peso))
+        return self._aristas_vertice(origen, vecinos[1:], res, vistas, resto_vertices)
+    def existe_camino(self, origen, destino, visitados=None):
+        if visitados is None:
+            visitados = set()
+        if origen == destino:
+            return True
+        visitados.add(origen)
+        return self._existe_camino_vecinos(self.vecinos(origen), destino, visitados)
+    def _existe_camino_vecinos(self, vecinos, destino, visitados):
+        if not vecinos:
+            return False
+        vecino = vecinos[0]
+        if vecino not in visitados:
+            if self.existe_camino(vecino, destino, visitados | {vecino}):
+                return True
+        return self._existe_camino_vecinos(vecinos[1:], destino, visitados)
+    def kruskal_rec_no_optimizado1(self):
+        aristas = sorted(self.aristas(), key=lambda x: x[2])
+        mst = GrafoPonderado()
+        self._agregar_vertices(list(self.lista_adyacencia), mst)
+        return self._kruskal_rec_no_optimizado1(aristas, mst)
+    def _kruskal_rec_no_optimizado1(self, aristas, mst):
+        if not aristas:
+            return mst
+        u, v, peso = aristas[0]
+        if not mst.existe_camino(u, v):
+            mst.agregar_arista(u, v, peso)
+        return self._kruskal_rec_no_optimizado1(aristas[1:], mst)
+    def kruskal_rec_optimizado1(self):
+        aristas = sorted(self.aristas(), key=lambda x: x[2])
+        uf = UnionFind(self.lista_adyacencia.keys())
+        mst = GrafoPonderado()
+        self._agregar_vertices(list(self.lista_adyacencia), mst)
+        return self._kruskal_rec_optimizado1(aristas, uf, mst)
+    def _kruskal_rec_optimizado1(self, aristas, uf, mst):
+        if not aristas:
+            return mst
+        u, v, peso = aristas[0]
+        if uf.find(u) != uf.find(v):
+            mst.agregar_arista(u, v, peso)
+            uf.union(u, v)
+        return self._kruskal_rec_optimizado1(aristas[1:], uf, mst)
+    def _construir_grafo(self, aristas, grafo=None):
+        if grafo is None:
+            grafo = GrafoPonderado()
+            self._agregar_vertices(list(self.lista_adyacencia), grafo)
+        if not aristas:
+            return grafo
+        u, v, peso = aristas[0]
+        grafo.agregar_arista(u, v, peso)
+        return self._construir_grafo(aristas[1:], grafo)
+    def _agregar_vertices(self, vertices, grafo):
+        if not vertices:
+            return
+        grafo.agregar_vertice(vertices[0])
+        self._agregar_vertices(vertices[1:], grafo)
+    def kruskal_rec_no_optimizado2(self):
+        aristas = sorted(self.aristas(), key=lambda x: x[2])
+        g_aux = GrafoPonderado()
+        self._agregar_vertices(list(self.lista_adyacencia), g_aux)
+        return self._kruskal_rec_no_optimizado2(aristas, g_aux)
+    def _kruskal_rec_no_optimizado2(self, aristas, g_aux):
+        if not aristas:
+            return []
+        u, v, peso = aristas[0]
+        if not g_aux.existe_camino(u, v):
+            g_aux.agregar_arista(u, v, peso)
+            return [(u, v, peso)] + self._kruskal_rec_no_optimizado2(aristas[1:], g_aux)
+        return self._kruskal_rec_no_optimizado2(aristas[1:], g_aux)
+    def kruskal_rec_optimizado2(self):
+        aristas = sorted(self.aristas(), key=lambda x: x[2])
+        uf = UnionFind(self.lista_adyacencia.keys())
+        return self._kruskal_rec_optimizado2(aristas, uf)
+    def _kruskal_rec_optimizado2(self, aristas, uf):
+        if not aristas:
+            return []
+        u, v, peso = aristas[0]
+        if uf.find(u) != uf.find(v):
+            uf.union(u, v)
+            return [(u, v, peso)] + self._kruskal_rec_optimizado2(aristas[1:], uf)
+        return self._kruskal_rec_optimizado2(aristas[1:], uf)
+    def camino_mas_largo(self, origen, destino, caminos=None):
+        if caminos is None:
+            caminos = self.todos_los_caminos(origen, destino)
+        if not caminos:
+            return []
+        if len(caminos) == 1:
+            return caminos[0]
+        mejor_resto = self.camino_mas_largo(origen, destino, caminos[1:])
+        if len(caminos[0]) > len(mejor_resto):
+            return caminos[0]
+        return mejor_resto
+    def es_arbol_binario(self, raiz):
+        if not self.es_conexo():
+            return False
+        visitados = set()
+        return self._es_arbol_binario(raiz, None, visitados)
+    def _hijos(self, nodo, padre, l_vecinos=None):
+        if l_vecinos is None:
+            l_vecinos = self.vecinos(nodo)
+        if not l_vecinos:
+            return []
+        if l_vecinos[0] == padre:
+            return self._hijos(nodo, padre, l_vecinos[1:])
+        return [l_vecinos[0]] + self._hijos(nodo, padre, l_vecinos[1:])
+    def _es_arbol_binario(self, actual, padre, visitados):
+        if actual in visitados:
+            return False
+        visitados.add(actual)
+        hijos = self._hijos(actual, padre)
+        if len(hijos) > 2:
+            return False
+        return self._verificar_hijos(hijos, actual, visitados)
+    def _verificar_hijos(self, hijos, padre, visitados):
+        if not hijos:
+            return True
+        if not self._es_arbol_binario(hijos[0], padre, visitados):
+            return False
+        return self._verificar_hijos(hijos[1:], padre, visitados)
+    def aArbolBinario(self, raiz):
+        nodo_raiz = self._aArbolBinario(raiz, None)
+        arbol = arbol_binario_genericos()
+        arbol.raiz = nodo_raiz
+        return arbol
+    def _aArbolBinario(self, actual, padre):
+        hijos = self._hijos(actual, padre)
+        izquierdo = None
+        derecho = None
+        if len(hijos) >= 1:
+            izquierdo = self._aArbolBinario(hijos[0], actual)
+        if len(hijos) == 2:
+            derecho = self._aArbolBinario(hijos[1], actual)
+        nodo = Nodo(actual)
+        nodo.izquierdo = izquierdo
+        nodo.derecho = derecho
+        return nodo
+    def aristas2(self, vertices=None):
+        if vertices is None:
+            vertices = list(self.lista_adyacencia)
+        if not vertices:
+            return []
+        return [self.lista_adyacencia[vertices[0]]] + self.aristas2(vertices[1:])
+    def aristas_sin_peso(self, aristas=None):
+        if aristas is None:
+            aristas = self.aristas2()
+        return [(aristas[0], aristas[1])] + self.aristas_sin_peso(aristas[1:])
+    def digrafos(self):
+        return self._digrafos(self.aristas(), [])
+    def _digrafos(self, aristas, orientadas):
+        if not aristas:
+            g = GrafoDirigido()
+            g.agregar_lista_vertices(list(self.lista_adyacencia))
+            g.agregar_aristas_orientadas(orientadas)
+            return [g]
+        u, v, peso = aristas[0]
+        return (self._digrafos(aristas[1:], orientadas + [(u, v)]) + \
+            self._digrafos(aristas[1:], orientadas + [(v, u)]))
     def __str__(self):
         return str(self.lista_adyacencia)
+
+
 
 g = GrafoPonderado()
 
@@ -1050,8 +1365,10 @@ g.agregar_vertice("D")
 g.agregar_arista("A", "B", 3)
 g.agregar_arista("A", "C", 2)
 g.agregar_arista("B", "D", 7)
-g.agregar_arista("C", "D", 8)
 
+
+
+print("Grafo ponderado: ")
 print(g)
 
 print(g.dijkstra("A"))
@@ -1068,3 +1385,272 @@ print("Camino sin ciclos: ")
 print(g.camino_sin_ciclos("A", "D"))
 
 print(g.sin_ciclos(["A", "B", "C", "D"], ("D", "A")))
+
+print(g.es_vecino_de("A", "B"))
+
+print(g.vecinos_de("A"))
+
+
+origen = "A"
+destino = "D"
+print(f"Todos los caminos desde {origen} hasta {destino}: ")
+print(g.todos_los_caminos(origen, destino))
+
+print(g.caminos_con_peso(origen, destino))
+
+print(f"Camino más liviano de {origen} a {destino}: ")
+print(g.camino_mas_liviano(origen, destino))
+
+print(f"Camino más pesado de {origen} a {destino}: ")
+print(g.camino_mas_pesado(origen, destino))
+
+print("Kruskal 1 con existe_camino (devuelve grafo): ")
+print(g.kruskal_rec_no_optimizado1())
+
+print("Kruskal optimizado 1 (devuelve grafo): ")
+print(g.kruskal_rec_optimizado1())
+
+print("Kruskal 2 con existe_camino (devuelve lista de aristas con peso): ")
+print(g.kruskal_rec_no_optimizado2())
+
+print("Kruskal optimizado 2 (devuelve lista de aristas con peso): ")
+print(g.kruskal_rec_optimizado2())
+
+print(f"Camino más largo desde {origen} a {destino}: ")
+print(g.camino_mas_largo(origen, destino))
+
+raiz = "A"
+print(f"¿Es arbol binario el grafo con raiz {raiz}?")
+print(g.es_arbol_binario(raiz))
+
+arbol = arbol_binario_genericos()
+
+print("Grafo como arbol: ")
+print(g.aArbolBinario("A"))
+
+print("Digrafos contenidos en el grafo: ")
+print(g.digrafos())
+
+class Bellman_Ford_Recursivo:
+    def __init__(self, vertices, aristas):
+        self.vertices = vertices
+        self.aristas = aristas
+    def bellman_ford_rec(self, origen):
+        distancia = {v: float("inf") for v in self.vertices}
+        predecesor = {v: None for v in self.vertices}
+        distancia[origen] = 0
+        self.bellman_ford_iteraciones(len(self.vertices) - 1, self.aristas, distancia, predecesor)
+        ciclo = self.detectar_ciclo_negativo(self.aristas, distancia, 0)
+        return distancia, predecesor, ciclo
+    def bellman_ford_iteraciones(self, k, aristas, distancia, predecesor):
+        if k == 0:
+            return
+        self.relajar_aristas(aristas, distancia, predecesor)
+        self.bellman_ford_iteraciones(k - 1, aristas, distancia, predecesor)
+    def relajar_aristas(self, aristas, distancia, predecesor):
+        if not aristas:
+            return
+        u, v, peso = aristas[0]
+        if distancia[u] != float("inf"):
+            if distancia[u] + peso < distancia[v]:
+                distancia[v] = (distancia[u] + peso)
+                predecesor[v] = u
+        self.relajar_aristas(aristas[1:], distancia, predecesor)
+    def detectar_ciclo_negativo(self, aristas, distancia, indice):
+        if indice == len(aristas):
+            return False
+        u, v, peso = aristas[indice]
+        if distancia[u] != float("inf"):
+            if distancia[u] + peso < distancia[v]:
+                return True
+        return self.detectar_ciclo_negativo(aristas, distancia, indice + 1)
+    def reconstruir_camino(self, predecesor, destino):
+        if predecesor[destino] is None:
+            return [destino]
+        return (self.reconstruir_camino(predecesor, predecesor[destino]) + [destino])
+    def bellman_ford_camino(self, origen, destino):
+        distancia, predecesor, ciclo = self.bellman_ford_rec(origen)
+        if ciclo:
+            return None
+        if distancia[destino] == float("inf"):
+            return [], float("inf")
+        return (distancia[destino], self.reconstruir_camino(predecesor, destino))
+    
+b = Bellman_Ford_Recursivo(["S","A","B","C","D"],
+[
+    ("S","A",3),
+    ("S","B",4),
+    ("B","A",-2),
+    ("A","C",2),
+    ("C","D",1)
+])
+
+print(b.bellman_ford_camino("S","D"))
+
+import heapq
+
+class Dijkstra_Recursivo:
+    def __init__(self, lista_adyacencia):
+        self.lista_adyacencia = lista_adyacencia
+    def dijkstra(self, origen):
+        dist = {nodo: float("inf") for nodo in self.lista_adyacencia}
+        previo = {}
+        dist[origen] = 0
+        cola = [(0, origen)]
+        self._dijkstra(cola, dist, previo)
+        return dist, previo
+    def _dijkstra(self, cola, dist, previo):
+        if not cola:
+            return
+        d, u = heapq.heappop(cola)
+        if d > dist[u]:
+            return self._dijkstra(cola, dist, previo)
+        self._relajar_vecinos(u, self.lista_adyacencia[u], d, cola, dist, previo)
+        return self._dijkstra(cola, dist, previo)
+    def _relajar_vecinos(self,origen, vecinos, dist_u, cola, dist, previo):
+        if not vecinos:
+            return
+        v, peso = vecinos[0]
+        if dist_u + peso < dist[v]:
+            dist[v] = dist_u + peso
+            previo[v] = origen
+            heapq.heappush(cola, (dist[v], v))
+        self._relajar_vecinos(origen, vecinos[1:], dist_u, cola, dist, previo)
+    def reconstruir_camino(self, previo, destino):
+        if previo.get(destino) is None:
+            return [destino]
+        return (self.reconstruir_camino(previo, previo[destino]) + [destino])
+    def dijkstra_camino(self, origen, destino):
+        dist, previo = self.dijkstra(origen)
+        if dist[destino] == float("inf"):
+            return [], float("inf")
+        return (dist[destino], self.reconstruir_camino(previo, destino))
+
+g = Dijkstra_Recursivo({
+    "A": [("B",3), ("C",2)],
+    "B": [("D",7)],
+    "C": [("D",8)],
+    "D": []
+})
+
+print(g.dijkstra_camino("A", "D"))
+#No funciona con ciclos negativos
+
+class Grafo_Completo(Grafo2):
+    def __init__(self, lista_adyacencia):
+        super().__init__(lista_adyacencia)
+        if not self.es_completo():
+            raise ValueError("El grafo no es completo")
+    def es_completo(self, vertices=None):
+        if vertices is None:
+            vertices = list(self.lista_adyacencia)
+        if not vertices:
+            return True
+        v = vertices[0]
+        # Detecta paralelas
+        if len(self.lista_adyacencia[v]) != len(set(self.lista_adyacencia[v])):
+            return False
+        # Detecta bucles
+        if v in self.lista_adyacencia[v]:
+            return False
+        vecinos = set(self.lista_adyacencia[v])
+        esperado = set(self.lista_adyacencia)
+        esperado.remove(v)
+        if vecinos != esperado:
+            return False
+        return self.es_completo(vertices[1:])
+    def copiar_lista(self, lista):
+        if not lista:
+            return []
+        return [lista[0]] + self.copiar_lista(lista[1:])
+    def copiar_vecinos(self, items, copia = None):
+        if copia is None:
+            copia = {}
+        if not items:
+            return copia
+        copia[items[0][0]] = self.copiar_lista(items[0][1])
+        return self.copiar_vecinos(items[1:], copia)
+    def aGrafo(self):
+        copia = self.copiar_vecinos(list(self.lista_adyacencia.items()))
+        return Grafo2(copia)
+    def __str__(self):
+        return f"Lista de adyacencia: {str(self.lista_adyacencia)}"
+        
+g = Grafo_Completo({"A": ["B", "C", "D"],
+                    "B": ["A", "C", "D"],
+                    "C": ["A", "B", "D"],
+                    "D": ["A", "B", "C"]})
+    
+g.agregar_vertice("E")
+g.agregar_arista("D", "E")
+
+print(g)
+print(g.aGrafo())
+
+class Grafo_Bipartito_Completo(Grafo2):
+    def __init__(self, lista_adyacencia):
+        super().__init__(lista_adyacencia)
+        if not self.es_bipartito_completo():
+            raise ValueError("El grafo no es bipartito completo")
+    def _colorear(self, actual, color, colores):
+        if actual in colores:
+            return colores[actual] == color
+        colores[actual] = color
+        return self._colorear_vecinos(self.vecinos(actual), 1 - color, colores)
+    def _colorear_vecinos(self, vecinos, color, colores):
+        if not vecinos:
+            return True
+        if not self._colorear(vecinos[0], color, colores):
+            return False
+        return self._colorear_vecinos(vecinos[1:], color, colores)
+    def _verificar_bipartito_completo(self, vertices, colores):
+        if not vertices:
+            return True
+        actual = vertices[0]
+        if not self._conectado_con_todos_del_otro_color(actual, list(colores), colores):
+            return False
+        return self._verificar_bipartito_completo(vertices[1:], colores)
+    def _conectado_con_todos_del_otro_color(self, actual, vertices, colores):
+        if not vertices:
+            return True
+        otro = vertices[0]
+        if actual != otro:
+            if colores[actual] != colores[otro]:
+                if otro not in self.vecinos(actual):
+                    return False
+            else:
+                if otro in self.vecinos(actual):
+                    return False
+        return self._conectado_con_todos_del_otro_color(actual, vertices[1:], colores)
+    def vecinos(self, vertice):
+        return self.lista_adyacencia[vertice]
+    def es_bipartito_completo(self):
+        vertices = list(self.lista_adyacencia)
+        if not vertices:
+            return True
+        colores = {}
+        if not self._colorear(vertices[0], 0, colores):
+            return False
+        return self._verificar_bipartito_completo(vertices, colores)
+    def copiar_vecinos(self, items, copia = None):
+        if copia is None:
+            copia = {}
+        if not items:
+            return copia
+        copia[items[0][0]] = items[0][1]
+        return self.copiar_vecinos(items[1:], copia)
+    def aGrafo(self):
+        copia = self.copiar_vecinos(list(self.lista_adyacencia.items()))
+        return Grafo2(copia)
+    def __str__(self):
+        return f"Lista de adyacencia: {str(self.lista_adyacencia)}"
+    
+    
+g = Grafo_Bipartito_Completo({"A": ["C", "D"],
+                    "B": ["C", "D"],
+                    "C": ["A", "B"],
+                    "D": ["A", "B"]})
+
+g.eliminar_arista("A", "C")
+print(g)
+print(g.aGrafo())

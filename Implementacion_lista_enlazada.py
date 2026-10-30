@@ -747,3 +747,90 @@ lista.insert(15)
 #Obtengo el índice del 25:
 print(lista.busqueda_binaria_recursiva(25))
 
+class Nodo:
+    def __init__(self, valor, nivel):
+        self.valor = valor
+        self.siguiente = [None] * (nivel + 1)
+    def __repr__(self):
+        return str(self.valor)
+    
+import random
+
+class SkipList:
+    MAX_NIVEL = 4
+    def __init__(self):
+        self.nivel = 0
+        self.cabeza = Nodo(float("-inf"), self.MAX_NIVEL)
+    def nivel_aleatorio(self):
+        nivel = 0
+        while (random.random() < 0.5 and nivel < self.MAX_NIVEL):
+            nivel += 1
+        return nivel
+    def buscar(self, valor):
+        actual = self.cabeza
+        for i in range(self.nivel, -1, -1):
+            while (actual.siguiente[i] and actual.siguiente[i].valor < valor):
+                actual = actual.siguiente[i]
+        actual = actual.siguiente[0]
+        if actual and actual.valor == valor:
+            return True
+        return False
+    def insertar(self, valor):
+        actual = self.cabeza
+        actualizar = [None] * (self.MAX_NIVEL + 1)
+        for i in range(self.nivel, -1, -1):
+            while (actual.siguiente[i] and actual.siguiente[i].valor < valor):
+                actual = actual.siguiente[i]
+            actualizar[i] = actual
+        actual = actual.siguiente[0]
+        if actual and actual.valor == valor:
+            return
+        nivel_nuevo = self.nivel_aleatorio()
+        if nivel_nuevo > self.nivel:
+            for i in range(self.nivel + 1, nivel_nuevo + 1):
+                actualizar[i] = self.cabeza
+            self.nivel = nivel_nuevo
+        nuevo = Nodo(valor, nivel_nuevo)
+        for i in range(nivel_nuevo + 1):
+            nuevo.siguiente[i] = actualizar[i].siguiente[i]
+            actualizar[i].siguiente[i] = nuevo
+    def eliminar(self, valor):
+        actual = self.cabeza
+        actualizar = [None] * (self.MAX_NIVEL + 1)
+        for i in range(self.nivel, -1, -1):
+            while (actual.siguiente[i] and actual.siguiente[i].valor < valor):
+                actual = actual.siguiente[i]
+            actualizar[i] = actual
+        actual = actual.siguiente[0]
+        if actual is None or actual.valor != valor:
+            return False
+        for i in range(self.nivel + 1):
+            if actualizar[i].siguiente[i] != actual:
+                break
+            actualizar[i].siguiente[i] = actual.siguiente[i]
+        while (self.nivel > 0 and self.cabeza.siguiente[self.nivel] is None):
+            self.nivel -= 1
+        return True
+    def __str__(self):
+        elementos = []
+        actual = self.cabeza.siguiente[0]
+        while actual:
+            elementos.append(str(actual.valor))
+            actual = actual.siguiente[0]
+        return " -> ".join(elementos)
+    
+s = SkipList()
+
+s.insertar(10)
+s.insertar(20)
+s.insertar(5)
+s.insertar(15)
+
+print(s)
+
+print(s.buscar(15))
+print(s.buscar(100))
+
+s.eliminar(10)
+
+print(s)
