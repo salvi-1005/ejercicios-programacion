@@ -1326,10 +1326,10 @@ class arbol_binario_genericos:
             encontrado = True
         if encontrado:
             return self._minimo(nodo_actual.derecho)
-        izquierda = self._predecesor2(nodo_actual.izquierdo, elemento, encontrado)
+        izquierda = self._sucesor2(nodo_actual.izquierdo, elemento, encontrado)
         if izquierda != None:
             return izquierda
-        return self._predecesor2(nodo_actual.derecho, elemento, encontrado)
+        return self._sucesor2(nodo_actual.derecho, elemento, encontrado)
     #7)
     def es_hoja(self, elemento):
         return self._es_hoja(self.raiz, elemento)
@@ -2510,3 +2510,55 @@ print(f"Resultado del arbol 6: {exp6.evaluar()}")
 #BST?, ABB?
 print(arbol6.espejo())
 print(arbol6.busqueda("*"))
+
+class ArbolBinario:
+    def __init__(self, raiz=None):
+        self.raiz = raiz
+    def buscar(self, valor):
+        return self._buscar(self.raiz, valor)
+    def _buscar(self, nodo_actual, valor):
+        if nodo_actual is None:
+            return False
+        if nodo_actual.valor == valor:
+            return True
+        return (self._buscar(nodo_actual.izquierdo, valor) or self._buscar(nodo_actual.derecho, valor))
+    def altura(self):
+        return self._altura(self.raiz)
+    def _altura(self, nodo_actual):
+        if nodo_actual is None:
+            return 0
+        return 1 + max(self._altura(nodo_actual.izquierdo), self._altura(nodo_actual.derecho))
+    def minimo(self):
+        return self._minimo(self.raiz)
+    def _minimo(self, nodo_actual):
+        if nodo_actual is None:
+            return float("inf")
+        return min(nodo_actual.valor, self._minimo(nodo_actual.izquierdo), self._minimo(nodo_actual.derecho))
+    def maximo(self):
+        return self._maximo(self.raiz)
+    def _maximo(self, nodo_actual):
+        if nodo_actual is None:
+            return float("-inf")
+        return max(nodo_actual.valor, self._maximo(nodo_actual.izquierdo), self._maximo(nodo_actual.derecho))
+    def _minimo_nodo(self, nodo_actual):
+        if nodo_actual is None:
+            return None
+        minimo_izq = self._minimo_nodo(nodo_actual.izquierdo)
+        minimo_der = self._minimo_nodo(nodo_actual.derecho)
+        minimo = nodo_actual
+        if (minimo_izq is not None and minimo_izq.codigo < minimo.codigo):
+            minimo = minimo_izq
+        if (minimo_der is not None and minimo_der.codigo < minimo.codigo):
+            minimo = minimo_der
+        return minimo
+    def _maximo_nodo(self, nodo_actual):
+        if nodo_actual is None:
+            return None
+        maximo_izq = self._maximo_nodo(nodo_actual.izquierdo)
+        maximo_der = self._maximo_nodo(nodo_actual.derecho)
+        maximo = nodo_actual
+        if (maximo_izq is not None and maximo_izq.codigo > maximo.codigo):
+            maximo = maximo_izq
+        if (maximo_der is not None and maximo_der.codigo > maximo.codigo):
+            maximo = maximo_der
+        return maximo
